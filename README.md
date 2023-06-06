@@ -1,1 +1,1 @@
-# GraphCutInteractive
+# Interactive Graph Cut Image Segmentation

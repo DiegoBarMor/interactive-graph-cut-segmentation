@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+      <title>Interactive Graph Cut Image Segmentation</title>
+      <link rel="stylesheet" type="text/css" href=style.css>
+      <script type = "text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+      </script>
+      <script type="text/javascript" async
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+      </script>
+    </head>
+    <body>
+      <div class="nav">
+        <a href="#introduction">Introduction</a>
+        <a href="#theory">Theoretical Background</a>
+        <a href="#graph">Graph Preparation</a>
+        <a href="#algorithm">Boykov-Kolmogorov Algorithm</a>
+        <a href="#implementation">Python Implementation</a>
+        <a href="#results">Results</a>
+        <a href="#references">References</a>
+      </div>
+
+      <div class="contents">
+        <h1>Interactive Graph Cut Image Segmentation</h1>
+
+        <h2 id="#introduction">Introduction</h2>
+          Interactive image segmentation techniques are a promising alternative to fully automatic segmentation. They take a small human input as ground truth and then expand it via an algorithm to segment the image with (hopefully) more realistic and useful results. <br><br>
+
+          The method described in <a href="#ref1">[1]</a> and <a href="#ref2">[2]</a> was implemented in Python and can be found <a href="https://github.com/DiegoBarqueroMorera/interactive-graph-cut-segmentation" target="_blank">here</a>. The goal of this method is to segment an image into two parts (binary segmentation): <b>object</b> and <b>background</b>. A user provides a set of pixels that are certain to be part of the object, and another set of pixels certain to be part of the background. Both sets are denominated <b>seeds</b> for object and background respectively.
+          <br><br>
+
+          Taking into account both sets of seeds, the image is first represented as a directed graph. Then, the image is segmented by finding the optimal <i>cut</i> of the edges of the graph, by exploiting the <i>max-flow min-cut</i> theorem. In the next sections, a brief introduction of these concepts is presented, as well as the details of the algorithm and the Python implementation.
+
+        <h2 id="#theory">Theoretical Background</h2>
+
+        <h2 id="#graph">Graph Preparation</h2>
+
+        <h2 id="#algorithm">Boykov-Kolmogorov Algorithm</h2>
+
+        <h2 id="#implementation">Python Implementation</h2>
+
+        <h2 id="#results">Results</h2>
+
+        <h2 id="#references">References</h2>
+          <ol>
+            <li id="#ref1">https://www.csd.uwo.ca/~yboykov/Papers/iccv01.pdf</li>
+            <li id="#ref2">https://www.csd.uwo.ca/~yboykov/Papers/pami04.pdf</li>
+          </ol>
+
+      </div>
+    </body>
+  </html>
