@@ -96,11 +96,11 @@
             For minimizing the energy and thus obtain the optimal cut, the <b>max-flow min-cut</b> theorem can be exploited. This theorem states that the maximum flow from $S$ to $T$ saturates a set of edges $C^*$ that correspond to the minimum cut, leaving behind two disjoint subgraphs $G_S$ and $G_T$. The objective of many graph based segmentation methods is to take advantage on this duality property and find the maximum flow of the system, which guarantees the minimum cut and the optimal segmentation given the inputs.
 
         <h2 id="#graph">Graph Preparation</h2>
-          After mapping the pixels of the image into the nodes and edges of a graph, assigning weights to the edges requires an energy function to be defined. For this implementation, the energy functions were inspired by <a href="#ref1">[1]</a>. Consider $O \in P$ the subset of pixels marked as a seed for object and $B \in P$ the pixels marked as a seed for background. Then, the energy functions consist of
+          After mapping the pixels of the image into the nodes and edges of a graph, assigning weights to the edges requires an energy function to be defined. For this implementation, the energy functions were inspired by <a href="#ref1">[1]</a>. Consider $Obj \in P$ the subset of pixels marked as a seed for object and $Bkg \in P$ the pixels marked as a seed for background. Then, the energy functions consist of
           $$
           Bp(p, q) = \exp(-\frac{(Ip - Iq)^2}{2 \sigma^2})\\
-          Rp_{obj}(p) = -\ln(\Pr(Ip | O)) \\
-          Rp_{bkg}(p) = -\ln(\Pr(Ip | B))
+          Rp_{obj}(p) = -\ln(\Pr(Ip | Obj)) \\
+          Rp_{bkg}(p) = -\ln(\Pr(Ip | Bkg))
           $$
 
           In this implementation, the probability of the intensity given a seed is dsecribed by the histogram of intensities for pixels in the given seed. Other approaches could also be considered, such as using the seeds to estimate the parameters of a Gaussian distribution. Furthermore, a constant $K$ is also defined as $$K = 1 + \max_{p \in P} \sum_{q : (p,q) \in E_n} Bp(p,q)$$
@@ -124,28 +124,28 @@
             <tr>
               <td class="tg-nrix" rowspan="3">$(S,p)$</td>
               <td class="tg-nrix">$\lambda Rp_{bkg}(p)$</td>
-              <td class="tg-nrix">$p \in P, p \notin O \cup B$</td>
+              <td class="tg-nrix">$p \in P, p \notin Obj \cup Bkg$</td>
             </tr>
             <tr>
               <td class="tg-nrix">$K$</td>
-              <td class="tg-nrix">$p \in O$</td>
+              <td class="tg-nrix">$p \in Obj$</td>
             </tr>
             <tr>
               <td class="tg-nrix">$0$</td>
-              <td class="tg-nrix">$p \in B$</td>
+              <td class="tg-nrix">$p \in Bkg$</td>
             </tr>
             <tr>
               <td class="tg-nrix" rowspan="3">$(p,T)$</td>
               <td class="tg-nrix">$\lambda Rp_{obj}(p)$</td>
-              <td class="tg-nrix">$p \in P, p \notin O \cup B$</td>
+              <td class="tg-nrix">$p \in P, p \notin Obj \cup Bkg$</td>
             </tr>
             <tr>
               <td class="tg-nrix">$0$</td>
-              <td class="tg-nrix">$p \in O$</td>
+              <td class="tg-nrix">$p \in Obj$</td>
             </tr>
             <tr>
               <td class="tg-nrix">$K$</td>
-              <td class="tg-nrix">$p \in B$</td>
+              <td class="tg-nrix">$p \in Bkg$</td>
             </tr>
           </tbody>
           </table>
@@ -157,11 +157,87 @@
           Pixels that are marked as seeds take this to the extreme, by assigning $0$ to their opposite seed, marking them as cut by default. On the contrary, a very high constant $K$ is assigned to the weight of their corresponding seed, making the cut unfeasible under all circumstances. This could also be adjusted to $K = \infty$ if desired.
 
         <h2 id="#algorithm">Boykov-Kolmogorov Algorithm</h2>
-          Once the graph is initialized, different algorithms can be used to find the max-flow. For this implementation, a push-relabel based algorithm described in <a href="#ref2">[2]</a> was employed, which will continue to be described as the <b>BK algorithm</b>. <br><br>
+          Once the graph is initialized, different algorithms can be used to find the max-flow. For this implementation, an <i>augmenting path</i> based algorithm described in <a href="#ref2">[2]</a> was employed, which will continue to be described as the <b>BK algorithm</b>. <br><br>
 
-          Push-relabel algorithms iteratively look for paths from the source to the sink ($path_{ST}$), push flow through them, and continue until all possible paths from the source to the sink become saturated. The BK algorithm seeks to improve performance of other push-relabel methods by optimizing the step where $path_{ST}$ is searched.
+          Traditionally, augmenting path algorithms iteratively look for the shortest paths from the source to the sink ($path_{ST}$), having to start the search process if time that all the paths of a given length are exhausted (i.e. they become saturated). The BK algorithm seeks to improve performance of other push-relabel methods by optimizing the step where $path_{ST}$ is searched, by reusing paths from previous iterations.
 
-          (...)
+          The basic idea is to build two separate non-overlapping search trees, one starting from $S$ and the other from $T$. These trees are grown (via, for example, breadth first search), and whenever they touch, a $path_{ST}$ is found. Note that this path is not necessarily the shortest path possible. After using the $path_{ST}$, the trees are shortened in a particular way, so in next iterations the modified trees are taken as starting point and grown.
+
+          <h3>Overview</h3>
+            At any given moment, two search trees occupy nodes from $P$: $S_t$ having as root the source and $T_t$ having as root the sink. The nodes not present in $S_t \cup T_t$ are said to be "free", and can be grouped as $F$. Therefore
+            $$S_t \subset V, \quad T_t \subset V, \quad F \subset N, \quad S_t \cup T_t \cup F = V \\ S_t \cap T_t = T_t \cap F = F \cap S_t = \emptyset$$
+
+            This algorithm is based on a directed graph, so order of edges does matter. For any given edge $E = (p,q)$ of a tree, a <b>parent-child</b> relationship can be defined according to the tree it belongs to. Furthermore, any edge covered by a search tree must be unsaturated.
+
+            <table class="tg">
+            <thead>
+              <tr>
+                <th class="tg-nrix">tree</th>
+                <th class="tg-nrix">parent</th>
+                <th class="tg-nrix">child</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="tg-nrix">$S_t$</td>
+                <td class="tg-nrix">$p$</td>
+                <td class="tg-nrix">$q$</td>
+              </tr>
+              <tr>
+                <td class="tg-nrix">$T_t$</td>
+                <td class="tg-nrix">$q$</td>
+                <td class="tg-nrix">$p$</td>
+              </tr>
+            </tbody>
+            </table>
+
+            The nodes from either tree can be <b>active</b> or <b>passive</b>. The active nodes $A \subset N$ are the leaves of the tree, while passive nodes are internal. Active nodes $p \in A$ allow the tree to <b>grow</b> by recruiting new children $q$ such that $q \in F$ and $e = (p, q), w_e > 0$. During this process, a $path_{ST}$ is found when a leaf from $S_t$ tries to recruit a leaf from $T_t$ or viceversa. These concepts are schematized by <a href="#ref2">[2]</a> in the following way:
+
+            <figure>
+              <img id="fig_with_text" src="report-figures/bk_schema.png", alt="Schema for the BK algorithm">
+            </figure>
+
+            A final subset of nodes $O$ denominated <b>orphans</b> is also considered. The BK algorithm is started by <a href="#graph">representing the image as a graph</a>, then initializing the search related subsets as
+            $$S_t = Obj, \quad T_t = Bkg, \quad A = Borders(S_t) \cup Borders(T_t), \quad O = \emptyset$$
+
+            Some other terms are also defined, namely:
+            <ul>
+                <li>$TREE(p)$, a flag that stores whether a node is part of $S_t$, $T_t$ or $F$</li>
+                <li>$PARENT(p)$, to refer to the parent of $p$ in $TREE(p)$</li>
+                <li>$ORIGIN(p)$, which can be either $S$ or $T$ and requires a valid path between $p$ and its respective terminal, otherwise $ORIGIN(p) = \varnothing$</li>
+                <li>$cap(p \to q)$, which refers to the residual capacity of the edge $(p, q)$ if $TREE(p) = S_t$ or $(q, p)$ if $TREE(p) = T_t$</li>
+            </ul>
+
+            After initialization, the algorithm iteratively repeats three stages: <b>Growth</b>, <b>Augmentation</b> and <b>Adoption</b>. Exiting from the loop is controlled by the result of the growth stage.
+
+            <figure>
+              <img id = "fig_small" src="report-figures/borders.png", alt="Description of Borders()">
+              <figcaption>Description of the $Borders$ function. This is a small addition to the original BK algorithm that optimizes the first iteration when large seeds are given.</figcaption>
+            </figure>
+
+          <h3>Growth</h3>
+            This stage is summarized by <a href="#ref2">[2]</a> as: "search trees [$S_t$] and [$T_t$] grow until they touch giving a [$path_{ST}$]". This is the stage where active nodes try to recruit new free nodes, until all active nodes are depleted. It returns a $path_{st}$ if it finds one, otherwise the stage loop ends and $path_{st}$ is returned as $\emptyset$. This halts the BK algorithm main loop, indicating that the optimal cut was found.
+
+            <figure>
+              <img id = "fig_with_text" src="report-figures/stage_grow.png", alt="Pseudocode for the growth stage">
+              <figcaption>Pseudocode for the growth stage, as provided by <a href="#ref2">[2].</a></figcaption>
+            </figure>
+
+          <h3>Augmentation</h3>
+            This stage is summarized by <a href="#ref2">[2]</a> as: "the found path is augmented, search tree(s) break into forest(s)". It takes as input the $path_{ST}$ found in the growth stage, and pushes the maximum amount of flow that path can handle. This means one or more edges in the path get saturated, making these edges invalid as a parent-child relationship. An affected child node becomes both an <b>orphan</b> and the root of a new subtree $O_t$ spanning the orphan's descendants. Futhermore, $ORIGIN(n) = \varnothing \quad \forall n \in O_t$.
+
+            <figure>
+              <img id = "fig_with_text" src="report-figures/stage_augment.png", alt="Pseudocode for the augmentation stage">
+              <figcaption>Pseudocode for the augmentation stage, as provided by <a href="#ref2">[2].</a></figcaption>
+            </figure>
+
+          <h3>Adoption</h3>
+            This stage is summarized by <a href="#ref2">[2]</a> as: "trees [$S_t$] and [$T_t$] are restored". This stage seeks to find a new valid parent $p$ for each orphan $o$. A valid parent should satisfy $TREE(p) = TREE(o), ORIGIN(p) = TREE(o)$ and the edge connecting them must satisfy $w_e > 0$. If a parent is found, the subtree $O_t$ is restored to the main tree and $ORIGIN(n) = TREE(p) \quad \forall n \in O_t$. If no parent is found, $TREE(o) := F$ and its children are declared as orphans. Furthermore, all neighbours $q$ of $o$ such that $TREE(q) = TREE(o)$ should become active. This procedure is repeated until no orphans are left.
+
+            <figure>
+              <img id = "fig_with_text" src="report-figures/stage_adopt.png", alt="Pseudocode for the adoption stage">
+              <figcaption>Pseudocode for the adoption stage, as provided by <a href="#ref2">[2].</a></figcaption>
+            </figure>
 
         <h2 id="#implementation">Python Implementation</h2>
 
