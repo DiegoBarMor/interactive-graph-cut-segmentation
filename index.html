@@ -17,7 +17,6 @@
         <a href="#graph">Graph Preparation</a>
         <a href="#algorithm">Boykov-Kolmogorov Algorithm</a>
         <a href="#implementation">Python Implementation</a>
-        <a href="#results">Results</a>
         <a href="#references">References</a>
       </div>
 
@@ -27,20 +26,90 @@
         <h2 id="#introduction">Introduction</h2>
           Interactive image segmentation techniques are a promising alternative to fully automatic segmentation. They take a small human input as ground truth and then expand it via an algorithm to segment the image with (hopefully) more realistic and useful results. <br><br>
 
-          The method described in <a href="#ref1">[1]</a> and <a href="#ref2">[2]</a> was implemented in Python and can be found <a href="https://github.com/DiegoBarqueroMorera/interactive-graph-cut-segmentation" target="_blank">here</a>. The goal of this method is to segment an image into two parts (binary segmentation): <b>object</b> and <b>background</b>. A user provides a set of pixels that are certain to be part of the object, and another set of pixels certain to be part of the background. Both sets are denominated <b>seeds</b> for object and background respectively.
+          The method described in <a href="#ref1">[1]</a> and <a href="#ref2">[2]</a> was implemented in Python and can be found <a href="https://github.com/DiegoBarqueroMorera/interactive-graph-cut-segmentation" target="_blank">here</a>. The goal of this method is to segment a 2D image into two parts (binary segmentation): <b>object</b> and <b>background</b>. A user provides a set of pixels that are certain to be part of the object, and another set of pixels certain to be part of the background. Both sets are denominated <b>seeds</b> for object and background respectively.
           <br><br>
 
           Taking into account both sets of seeds, the image is first represented as a directed graph. Then, the image is segmented by finding the optimal <i>cut</i> of the edges of the graph, by exploiting the <i>max-flow min-cut</i> theorem. In the next sections, a brief introduction of these concepts is presented, as well as the details of the algorithm and the Python implementation.
 
         <h2 id="#theory">Theoretical Background</h2>
+          <h3>Graphs</h3>
+            A <b>graph</b> $G = (V, E)$ is defined as a set of <b>nodes</b> $V$ and a set of <b>edges</b> $E$. Each edge $e \in E$ connects a pair of nodes $p, q \in V$, such that $e = \{p, q\}$. A graph is <b>undirected</b> if $$e = \{p, q\} = \{q, p\} \forall e \in E, p, q \in V$$
+
+            and <b>directed</b> if $$e = \{p, q\} \neq \{q, p\}$$.
+
+            Finally, in a <b>weighted</b> (or capacitated) graph, each edge $e \in E$ is assigned a weight (or <b>cost</b>) $w_e \in \mathbb{R}$. <br><br>
+
+            An image can be represented as a graph by taking the intensity $Ip$ of each pixel $p$ and assigning it to a node in the subset $P \subset V$. The position information of the pixels is conserved by defining a subset of edges $E_n \subset E$ such that any pair of nodes $p, q \in V$ corresponding to neighbouring pixels in the image is connected by an edge $e_n = \{p, q\} \in E_n$. Depending on the application, the graph may be defined as undirected or directed; in the latter case, another edge is defined for each pair of pixels $e_n' = \{q, p\}$. The edges from $E_n$ are known as neighbouring or <b>non-terminal</b> edges. For this implementation, 4-connected pixels are considered as neighbours, although some adjustments can be done for using other criteria.
+
+            <figure>
+              <img src="report-figures/n_edges.png", alt="Non-terminal edges">
+              <figcaption> Example of a 5x5 image (left) and its graph representation (right). Each node stores the original $Ip$ information and is connected to its neighbours by non-terminal edges. </figcaption>
+            </figure>
+
+            For this segmentation method, two special nodes are added: an "object" terminal called <b>source</b> ($S$) and a "background" terminal called <b>sink</b> ($T$). This means that $$V = P \cup \{S, T\}$$.
+
+            Furthermore, additional edges connect each node from $P$ to both $S$ and $T$, such that $$E_t = \bigcup_{p \in P} \{\{S,p\}, \{p,T\}\} \\ E = E_n \cup E_t$$.
+
+            Note that if directed edges are been employed, the order of the edges from $E_t$ matter.
+
+            <figure>
+              <img src="report-figures/n_t_edges.png", alt="Non-terminal and terminal edges">
+              <figcaption> Example of a 5x5 image (left) and its graph representation (right). The graph is expanded by adding the terminal nodes $S$ and $T$, as well as the edges connecting them to all the nodes from $P$. </figcaption>
+            </figure>
+
+          <h3>Graph Cuts</h3>
+            Given a set of nodes $A = \{a_1, \dots, a_n\}$, a <b>path</b> is a sequence of edges that allows to traverse from $a_1$ to $a_n$. A path that starts in the source and finished at the sink will be denominated here as $path_{St}$. A generic path can be defined as $$Path = \bigcup_i^{n-1} \{\{a_i, a_{i+1}\}\}$$
+
+            A <b>cut</b> is a subset of edges $C \subset E$ such that in the graph $G' = (V, E \backslash C)$ there is no path between the terminal nodes $S$ and $T$. Alternatively, it can be seen as the graph being separated into two sub-graphs, where all the nodes from a given subgraph is only connected to the same terminal node $$G' = G_S \cup G_T \\
+            G_S = \{V_S, E_n' \bigcup_{p \in P_S} \{\{S,p\}\}\} \\
+            G_T = \{V_T, E_n' \bigcup_{p \in P_T} \{\{p,T\}\}\} $$
+
+            Finally, the <b>cost</b> of the cut is defined as the sum of the weights of the edges it comprises $$|C| = \sum_{e \in C} w_e$$
+
+            <figure>
+              <img src="report-figures/cut.png", alt="Graph cut">
+              <figcaption> Example of a 5x5 image (left) and its graph representation (right). The subset of edges $C$ is removed from the graph, removing all possible paths from $S$ to $T$. </figcaption>
+            </figure>
+
+          <h3>Graph Flow</h3>
+            A weighted graph can be interpreted as a network of "pipes" described by its edges, where water can be imagined to flow in a given direction. For the specific graphs described before, the flow starts at the source node $S$, goes through the image nodes $P$ and end up in the sink node $T$ (hence the terminology used for the terminal nodes). <br><br>
+
+            The weights of the edges can represent different concepts under this interpretation, depending on what is required:
+
+            <ul>
+              <li><b>Flow</b> ($flow \ge 0$): The amount of water currently pushed through an edge. This value remains constant</li>
+              <li><b>Capacity</b> ($cap \ge 0$): How much water is supported by an edge</li>
+              <li><b>Residual</b> capacity ($res \ge 0$): The capacity left after pushing a certain amount of flow through the edge, given by $res = cap - flow$</li>
+            </ul>
+
+            Note the at any given moment the flow going through an edge can't exceed its capacity, so  $flow \le cap; res \ge 0$. In the specific case when $flow = edge; res = 0$, it is said that the edge is <b>saturated</b>, meaning that it is moving the maximum amount of water it can handle. Similarly, a <b>saturated path</b> is a path where one or more edges are saturated.
+
+          <h3>Optimal Cut</h3>
+            The idea of defining all of this concepts is to find a way to measure a given image segmentation. Such measure is to be optimized via an automatic algorithm, in order to choose the best image segmentation from the space of all possible segmentations. <br><br>
+
+            Intuitively, a graph cut can be interpreted as the segmentation of the image represented by the graph. An optimal segmentation would be a cut $C$ such that the nodes from the subgraphs obtained, $N_S$ and $N_T$, correspond to pixels that most likely belong to the object and background respectively. This <b>optimal cut</b> corresponds to the cut with the lowest cost $|C|$, and is often obtained by minimizing an energy function of the general form $$E(L) = \sum_{p \in P}Rp(Lp) + \sum_{\{p,q\} \in E_n}Bp(p, q)$$
+
+            where $L = \{L_p \in \{obj, bkg\} | p \in P\}$ is the binary labeling of the image, $Rp$ is a regional penalty function and $Bp$ a boundary penalty function. <br><br>
+
+            As the names suggest, $Rp$ penalizes pixels according to the region they are associated with. Here, "region" refers to either the object or the background, so the penalty works by checking how probable is the pixel part of the object or background, given a prior distribution obtained from the data. This prior is built from the seeds provided by the user. On the other hand, $Bp$ penalizes pixels according to their local interaction with neighbouring pixels, by comparing their $Ip$ values with some sort of metric. <br><br>
+
+            For minimizing the energy and thus obtain the optimal cut, the <b>max-flow min-cut</b> theorem can be exploited. This theorem states that the maximum flow from $S$ to $T$ saturates a set of edges $C^*$ that correspond to the minimum cut, leaving behind two disjoint subgraphs $G_S$ and $G_T$. The objective of many graph based segmentation methods is to take advantage on this duality property and find the maximum flow of the system, which guarantees the minimum cut and the optimal segmentation given the inputs.
 
         <h2 id="#graph">Graph Preparation</h2>
+          After mapping the pixels of the image into the nodes and edges of a graph, assigning weights to the edges requires an energy function to be defined. For this implementation, the energy functions from <a href="#ref1">[1]</a> where employed.
+
+          (...)
 
         <h2 id="#algorithm">Boykov-Kolmogorov Algorithm</h2>
+          Once the graph is initialized, different algorithms can be used to find the max-flow. For this implementation, a push-relabel based algorithm described in <a href="#ref2">[2]</a> was employed, which will continue to be described as the <b>BK algorithm</b>. <br><br>
+
+          Push-relabel algorithms iteratively look for paths from the source to the sink ($path_{ST}$), push flow through them, and continue until all possible paths from the source to the sink become saturated. The BK algorithm seeks to improve performance of other push-relabel methods by optimizing the step where $path_{ST}$ is searched.
+
+          (...)
 
         <h2 id="#implementation">Python Implementation</h2>
 
-        <h2 id="#results">Results</h2>
+          (...)
 
         <h2 id="#references">References</h2>
           <ol>
