@@ -26,7 +26,7 @@ class GUIDetails(GUI):
         self.ax_dict_details['f'].set_title("Rp bck")
 
         self.sl_details = Slider(
-            ax = self.ax_dict_details['x'], 
+            ax = self.ax_dict_details['x'],
             label = "Cut index", orientation = "vertical",
             valstep = 1, valinit = 0,
             valmin = 0, valmax = 1
@@ -42,8 +42,8 @@ class GUIDetails(GUI):
     def details_add_data(self):
         self.sl_details.active = True
 
-        mat_Bp_left, mat_Bp_right, mat_Bp_top, mat_Bp_bottom = self.graph.get_arrays_bp()
-        mat_Rp_obj, mat_Rp_bkg = self.graph.get_arrays_rp()
+        mat_Bp_left, mat_Bp_right, mat_Bp_top, mat_Bp_bottom = self.graph_cut.get_arrays_bp()
+        mat_Rp_obj, mat_Rp_bkg = self.graph_cut.get_arrays_rp()
         self.details_data.append(dict(
             Bp_l = mat_Bp_left,
             Bp_r = mat_Bp_right,

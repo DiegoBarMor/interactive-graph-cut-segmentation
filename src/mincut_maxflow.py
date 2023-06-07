@@ -199,6 +199,10 @@ class GraphCut:
         for edge in self.path_ST: ### update the residual graph by pushing flow ∆ through P
             edge.residual -= bottleneck_capacity
 
+            if edge.tail is self.graph.source or edge.head is self.graph.sink: continue
+
+            edge.get_reverse().residual += bottleneck_capacity
+
         for edge in self.path_ST:
             if not edge.residual: ### for each edge (p, q) in P that becomes saturated
                 p,q = edge.tail, edge.head

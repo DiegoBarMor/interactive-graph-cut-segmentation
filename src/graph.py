@@ -30,6 +30,7 @@ class SourceNode(Node):
         self.tree = SOURCE
         self.origin = SOURCE
 
+    def __repr__(self): return "SOURCE NODE"
 
 class SinkNode(Node):
     def __init__(self):
@@ -38,6 +39,7 @@ class SinkNode(Node):
         self.tree = SINK
         self.origin = SINK
 
+    def __repr__(self): return "SINK NODE"
 
 class NonTerminalNode(Node):
     __slots__ = ("parent")
