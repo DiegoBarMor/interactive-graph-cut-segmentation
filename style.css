@@ -69,6 +69,11 @@ h3 {
   color: cadetblue;
   margin-bottom: 1rem !important;
 }
+h4 {
+  color: cadetblue;
+  font-size: 14px;
+  margin-bottom: 0.5rem !important;
+}
 .contents a {
   color: var(--dark-color);
 }
