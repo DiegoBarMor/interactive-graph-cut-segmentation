@@ -27,8 +27,8 @@
 
       <div class="contents">
         <h1>Interactive Graph Cut Image Segmentation</h1>
-          <h4>Project report for the course <i>Signal, Image and Video</i>, University of Trento</h4>
-          <h4>By <a href="https://github.com/DiegoBarqueroMorera/">Diego Barquero Morera</a></h4>
+          <small>Project report for the course <i>Signal, Image and Video</i>, University of Trento</small> <br>
+          <small>By <a href="https://github.com/DiegoBarqueroMorera/">Diego Barquero Morera</a></small>
 
 
         <h2 id="introduction">Introduction</h2>
@@ -71,7 +71,7 @@
               $$V = P \cup \{S, T\}$$
 
               Furthermore, additional edges connect each node from $P$ to both $S$ and $T$, such that
-              $$E_t = \bigcup_{p \in P} \{\{S,p\}, \{p,T\}\} \\ E = E_n \cup E_t$$
+              $$E_t = \bigcup_{p \in P} \{(S,p), (p,T)\} \\ E = E_n \cup E_t$$
 
               Note that if directed edges are been employed, the order of the edges from $E_t$ matter.
             </p>
@@ -144,16 +144,15 @@
 
         <h2 id="graph">Graph Preparation</h2>
           <p>
+            First, the pixels from the image are mapped into nodes and edges of a graph.
             After mapping the pixels of the image into the nodes and edges of a graph, assigning weights to the edges requires an energy function to be defined. For this implementation, the energy functions were inspired by <a href="#ref1">[1]</a>. Consider $Obj \in P$ the subset of pixels marked as a seed for object and $Bkg \in P$ the pixels marked as a seed for background. Then, the energy functions consist of
             $$
               Bp(p, q) = \exp(-\frac{(Ip - Iq)^2}{2 \sigma^2})\\
               Rp_{obj}(p) = -\ln(\Pr(Ip | Obj)) \\
               Rp_{bkg}(p) = -\ln(\Pr(Ip | Bkg))
             $$
-          </p>
 
-          <p>
-            In this implementation, the probability of the intensity given a seed is dsecribed by the histogram of intensities for pixels in the given seed. Other approaches could also be considered, such as using the seeds to estimate the parameters of a Gaussian distribution. Furthermore, a constant $K$ is also defined as
+            In this implementation, the image is processed as black and white, so $Ip$ is a single value varying from 0 to 1 (the intensities must be normalized for $Bp$ to work correctly). Furthermore, the probability of the intensity given a seed is described by the histogram of intensities for pixels in the given seed. Other approaches could also be considered, such as using the seeds to estimate the parameters of a Gaussian distribution. Additionaly, a constant $K$ is also defined as
             $$K = 1 + \max_{p \in P} \sum_{q : (p,q) \in E_n} Bp(p,q)$$
 
             The edges can then be assigned weights according to the following table (note that both $\sigma$ and $\lambda$ are parameters that need to be set by the user):
@@ -263,7 +262,7 @@
             </p>
 
             <figure>
-              <img id="fig_with_text" src="report-figures/bk_schema.png", alt="Schema for the BK algorithm">
+              <img id="fig_large" src="report-figures/bk_schema.png", alt="Schema for the BK algorithm">
             </figure>
 
             <p>
@@ -295,7 +294,7 @@
             </p>
 
             <figure>
-              <img id="fig_with_text" src="report-figures/stage_grow.png", alt="Pseudocode for the growth stage">
+              <img id="fig_large" src="report-figures/stage_grow.png", alt="Pseudocode for the growth stage">
               <figcaption>Pseudocode for the growth stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
             </figure>
 
@@ -305,7 +304,7 @@
             </p>
 
             <figure>
-              <img id = "fig_with_text" src="report-figures/stage_augment.png", alt="Pseudocode for the augmentation stage">
+              <img id = "fig_large" src="report-figures/stage_augment.png", alt="Pseudocode for the augmentation stage">
               <figcaption>Pseudocode for the augmentation stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
             </figure>
 
@@ -315,30 +314,30 @@
             </p>
 
             <figure>
-              <img id = "fig_with_text" src="report-figures/stage_adopt.png", alt="Pseudocode for the adoption stage">
+              <img id = "fig_large" src="report-figures/stage_adopt.png", alt="Pseudocode for the adoption stage">
               <figcaption>Pseudocode for the adoption stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
             </figure>
 
 
-        <h2 id="#implementation">Python Implementation</h2>
+        <h2 id="implementation">Python Implementation</h2>
           <h3>Requirements</h3>
             <p>
               This implementation is written in Python 3. It aims to be highly portable, so it has few basic dependencies:
               <ul>
-                <li><b><a href="https://numpy.org/">NumPy</a></b> for representing images as matrices and optimize some steps.</li>
-                <li><b><a href="https://matplotlib.org/">Matplotlib</a></b> for building the main components of the interactive GUI.</li>
+                <li><b><a href="https://numpy.org/">NumPy</a></b> for representing images as matrices and optimizing some steps.</li>
+                <li><b><a href="https://matplotlib.org/">Matplotlib</a></b> for building the interactive GUI.</li>
                 <li><b><a href="https://pillow.readthedocs.io/en/stable/">Pillow</a></b> for easily handling I/O image operations.</li>
-                <li><b><a href="https://pypi.org/project/psutil/">psutil</a></b> for benchmarking the amount of memory required by the algorithm.</li>
+                <li><b><a href="https://pypi.org/project/psutil/">psutil</a></b> for benchmarking the amount of memory required by the program.</li>
               </ul>
             </p>
 
-          <h3>Usage</h3>
+          <h3>Basic Usage</h3>
             <p>
-              The source code of this implementation is available to download <a href="https://github.com/DiegoBarqueroMorera/interactive-graph-cut-segmentation">here</a>. Downloading <b>src/</b> is sufficient to execute the implementation, while additional test images can be downloaded from <b>test-images/</b>. The source code of this report is also available on the same repository.
+              The source code of this implementation is available to download <a href="https://github.com/DiegoBarqueroMorera/interactive-graph-cut-segmentation">here</a>. Downloading <code>src/</code> is sufficient to execute the implementation, while additional test images can be downloaded from <code>test-images/</code>. The source code of this report is also available on the same repository.
             </p>
 
             <p>
-              Two scripts are provided as an entry point to the program, <b>GUI_main.py</b> and <b>GUI_details.py</b>. Both of them behave almost identically (the latter displays an additional window with more details of the BK result), so the focus here is on <b>GUI_main.py</b>. When executed, the user is prompted with a window to select an image file. After that, the main window is displayed.
+              Two scripts are provided as an entry point to the program, <code>GUI_main.py</code> and <code>GUI_details.py</code>. Both of them behave almost identically (the latter displays an additional window with more details of the BK result), so the focus here is on <code>GUI_main.py</code>. When executed, the user is prompted with a window to select an image file. After that, the main window is displayed. To the left, the selected image is displayed in a black and white representation, while to the right different controls are available.
             </p>
 
             <figure>
@@ -346,79 +345,163 @@
               <figcaption>Main window of the GUI.</figcaption>
             </figure>
 
-            (...)
+            <p>
+              When hovering over the displayed image, four different actions are available. They can be selected by clicking the respective buttons at the right side, or by pressing the specified keyboard shortcut.
+              <ul>
+                <li><b>OBJ</b> allows to draw seeds for the object (shortcut: Z).</li>
+                <li><b>BKG</b> allows to draw seeds for the background (shortcut: X).</li>
+                <li><b>Erase</b> allows to erase any seed (shortuct: C).</li>
+                <li><b>Nothing</b> allows to interact with the standard matplotlib mouse callbacks, e.g. zooming the image (shortcut: V).</li>
+              </ul>
+
+              This actions are intuitively performed by pressing and holding over the image. Additionaly, the size of the "brush" can be increased by pressing <b>+</b> and decreased by pressing <b>-</b>. The drawn seeds can also be erased completely (<b>Clear seeds</b>), saved for later use (<b>Save seeds</b>) and loaded from previous sessions (<b>Load seeds</b>).
+            </p>
 
             <figure>
               <img src="report-gifs/GUI_seeds.gif", alt="Basic usage of the GUI">
               <figcaption>Basic usage of the GUI.</figcaption>
             </figure>
 
-            (...)
+          <h3>Fast and Animate cut modes</h3>
+            <p>
+              After preparing the seeds, the default $\sigma$ and $\lambda$ parameters can be modified. The segmentation can then be initialized, with four different options provided by the interface. Options denominated <b>Fast</b> follow a standard implementation of the BK algorithm's loop, and is to be used when only the result is of interest.
+            </p>
+
+            <p>
+              Once the segmentation is obtained, the result is portrayed on top of the displayed image. This representation can be toggled on or off, while the result itself can be saved as an image, either just the object (<b>Save OBJ</b>) or just the background (<b>Save OBJ</b>). Note that the algorithm yields a <b>mask</b>, which is used to save a segmentation of the original image and not its black and white representation.
+            </p>
 
             <figure>
               <img src="report-gifs/GUI_fast_cut.gif", alt="Performing a fast cut with the GUI">
-              <figcaption>Performing a fast cut with the GUI.</figcaption>
+              <figcaption>Performing a fast cut with the GUI. The final search trees are displayed as a semitransparent red for $S_t$ and semitransparent blue for $T_t$. </figcaption>
             </figure>
 
-            (...)
+            <p>
+              Options denominated <b>Animate</b> follow a slightly different BK algorithm's main loop. The loop performs a fixed amount of iterations, controlled by the parameter <code>CYCLES_PER_FRAME</code>. When concluded, the current state of the search trees and the last $path_{ST}$ are taken to draw a frame on top of the displayed image. Immediatly afterwards, a new loop is started resuming the state of the previous loop. This effectively allows to animate the algorithm's progress and better understand the concepts behind its execution.
+            </p>
+
+            <p>
+              When the BK algorithm's loop reaches its natural end, the results are displayed as usual. An additional option is present, <b>Toggle paths</b>, that allows to observe all the instances of $path_{ST}$ present in the animation. <code>CYCLES_PER_FRAME</code> should be assigned a sensible value to allow for a faster animation and avoid cluttering when visualizing all paths.
+            </p>
 
             <figure>
               <img src="report-gifs/GUI_animate_cut.gif", alt="Performing an animated cut with the GUI">
-              <figcaption>Performing an animated cut with the GUI.</figcaption>
+              <figcaption>Performing an animated cut with the GUI. The incomplete search trees follow the same color schema, while pixels crossed by $path_{ST}$ are displayed in green.</figcaption>
             </figure>
 
-            (...)
+          <h3>BFS and RND cut modes</h3>
+            <p>
+              In different flow based algorithms (including BK), the search procedure performed when finding paths is commonly a breadth-first search (BFS). However, different search methods can be employed, and in the case of a heuristic algorithm such as BK, this can mean affecting the performance of the procedure in a positive or negative way (although the optimal cut will always be the same).
+            </p>
 
-            <figure>
+            <p>
+              This idea is explored by the options denominated with <b>RND</b>, which employ an alternative version of the BK algorithm that uses a random based search in the growth stage. During this stage, when picking an active node BFS always takes the first node of the ordered array $A$, while RND chooses a node from a different random index each time. For completeness, options denominated with <b>BFS</b> employ the standard BFS based algorithm.
+            </p>
+
+            <figure style="display: inline">
               <img src="report-gifs/GUI_cut_bfs.gif", alt="Animation of a BFS cut">
               <img src="report-gifs/GUI_cut_rnd.gif", alt="Animation of a RND cut">
               <figcaption>Comparison of the growth phase between a BFS based cut (left) and a RND based cut (right).</figcaption>
             </figure>
 
-            <figure>
+            <p>
+              Ideally, in some cases this might allow to find the shortest $path_{ST}$ faster and improve performance, or reduce the number of BK main loop's cycles in some other unforeseen way. However, this is by nature a highly empirical decision. For example, in the images tested for this implementation, RND appears to find some shorter paths than BFS (as observed in the figure below), but ultimately requires slightly more cycles.
+            </p>
+
+            <figure style="display: inline">
               <img src="report-figures/gui_cut_bfs.png", alt="Paths found by a BFS cut">
               <img src="report-figures/gui_cut_rnd.png", alt="Paths found by a RND cut">
-              <figcaption>Comparison of the paths $path_{ST}$ found by a BFS based cut (left) and a RND based cut (right).</figcaption>
+              <figcaption>Comparison of the paths $path_{ST}$ found by a BFS based cut (left) and a RND based cut (right). BFS required 1769 cut cycles while RND required 1794 cycles.</figcaption>
             </figure>
 
-            (...)
-
-            [penalties]
-
-          <h3>Implementation Details</h3>
-
-            (...)
-
-          <h3>Examples</h3>
-
-            (...)
+          <h3>Additional Details</h3>
+            <p>
+              Some additional details can be observed after performing any kind of cut using <code>GUI_details.py</code>. The regional penalties can be observed by plotting the values of the costs of terminal edges. Note that <b>regions</b> of similarly valued edges can be observed around their respective extreme-valued seeds.
+            </p>
 
             <figure>
-              <img src="test-images/pup-OBJ-BFS-S0.01-L0.2-cycles_1769.png", alt="Result of the segmentation (object)">
-              <img src="test-images/pup-BKG-BFS-S0.01-L0.2-cycles_1769.png", alt="Result of the segmentation (background)">
-              <figcaption>Result of the segmentation: left) object, right) background.</figcaption>
+              <img id="fig_large" src="report-figures/penalties_Rp.png", alt="Rp penalties">
+              <figcaption>Representation of the penalty values for edges connecting to the source ("Rp bck") and to the sink ("Rp obj"). Darker values represent higher edge costs.</figcaption>
             </figure>
 
-            (...)
+            <p>
+              Representing the boundary penalties is a bit trickier. Each pixel is involved in up to four Bp values, one for each direction (left, right, up, down). Therefore, for displaying the values of the costs of non-terminal edges, four different plots are represented, one for each direction.
+            </p>
 
-            [bird.png]
+            <p>
+              Note that in the plots for the state <i>before</i> the cut, <b>boundaries</b> of high costs can be observed in sections where there is a drastic change of $Ip$ value. These boundaries are either vertical or horizontal, following the direction of the neighbouring relationship. Furthermore, it can be observed that many new perpendicular "borders" are generated after the cut. These are from pixels that belonged to one or more $path_{ST}$ and got saturated through the BK algorithm.
+            </p>
 
-            (...)
 
-            [fluff.png]
+            <figure style="display: inline">
+              <img id="fig_large" src="report-figures/penalties_Bp_before.png", alt="Bp penalties (before)">
+              <img id="fig_large" src="report-figures/penalties_Bp_after.png", alt="Bp penalties (after)">
+              <figcaption>Representation of the penalty values for edges connecting neighbours on the four different directions. Values before (left) and after (right) the cut can be compared. Darker values represent higher edge costs.</figcaption>
+            </figure>
 
-            (...)
+          <h3>Examples of Usage</h3>
+            <p>
+              Three simple images were used to test the graph-cut algorithm, with different degrees of complexity. The same set of seeds was used for a given image when obtaining different results. Below are some examples of usage under different values of $\sigma$.
+
+              <br><small>
+                * For this implementation, it is recommended to use images with less than one million pixels to retain performance, specially if performing animations. <br>
+                ** Due to a bug, changing $\lambda$ doesn't affect the result. This is to be fixed in the future.
+              </small>
+            </p>
+
+            <figure style="display: inline">
+              <img src="test-images/pup.png", alt="Example image: Simple illustration">
+              <img src="test-images/bird.png", alt="Example image: More detailed illustration">
+              <img src="test-images/fluff.png", alt="Example image: Photography">
+              <figcaption>Test images presented as examples for the segmentation, with different levels of complexity: left) a simple 304x304 illustration <a href="#ref6">[6]</a>, middle) a more detailed 414x354 illustration <a href="#ref7">[7]</a>, right) a 362x262 photography.</figcaption>
+            </figure>
+
+            <figure style="display: inline">
+              <img src="report-figures/pup_seeds.png", alt="Seeded image: Simple illustration">
+              <img src="report-figures/bird_seeds.png", alt="Seeded image: More detailed illustration">
+              <img src="report-figures/fluff_seeds.png", alt="Seeded image: Photography">
+              <figcaption>Sets of seeds used for each image.</figcaption>
+            </figure>
+
+            <figure style="display: inline">
+              <img src="test-images/pup-OBJ-BFS-S0.01-L0.2-cycles_1769.png", alt="Result of the segmentation (object)">
+              <img src="test-images/pup-BKG-BFS-S0.01-L0.2-cycles_1769.png", alt="Result of the segmentation (background)">
+              <figcaption>Result of the segmentation ($\sigma = 0.01, \lambda = 0.2$): left) object, right) background.</figcaption>
+            </figure>
+
+            <figure style="display: inline">
+              <img src="test-images/bird-OBJ-BFS-S0.1-L0.2-cycles_11568.png", alt="Result of the segmentation (sigma = 0.1)">
+              <img src="test-images/bird-OBJ-BFS-S0.01-L0.2-cycles_3797.png", alt="Result of the segmentation (sigma = 0.01)">
+              <img src="test-images/bird-OBJ-BFS-S0.001-L0.2-cycles_33.png", alt="Result of the segmentation (sigma = 0.001)">
+              <figcaption>Result of the segmentation under different parameter values (constant $\lambda = 0.2$): left) $\sigma = 0.1$, middle) $\sigma = 0.01$, right) $\sigma = 0.001$.</figcaption>
+            </figure>
+
+            <figure style="display: inline">
+              <img src="test-images/fluff-OBJ-BFS-S0.5-L0.2-cycles_38987.png", alt="Result of the segmentation (sigma = 0.5)">
+              <img src="test-images/fluff-OBJ-BFS-S0.1-L0.2-cycles_12188.png", alt="Result of the segmentation (sigma = 0.1)">
+              <img src="test-images/fluff-OBJ-BFS-S0.001-L0.2-cycles_0.png", alt="Result of the segmentation (sigma = 0.001)">
+              <figcaption>Result of the segmentation under different parameter values (constant $\lambda = 0.2$): left) $\sigma = 0.5$, middle) $\sigma = 0.1$, right) $\sigma = 0.001$.</figcaption>
+            </figure>
+
+            <p>
+              As expected, the results can vary drastically when changing $\sigma$. Reducing it makes the boundary penalty more strict, which can lead to more aggresive cuts and granularity in the results. On the other hand, increasing it relaxes the penalty, which can potentially disrupt how $Bp$ and $Rp$ relate when finding the max-flow and lead to erroneous segmentations.
+
+            </p>
+
+            <p>
+              Nevertheless, if a segmentation is not satisfactory, the seeds or parameters can be adjusted to try and obtain better results. This implementation of the BK algorithm proved to be relatively fast for small images, requiring just a couple of seconds to complete the segmentation and less than 500 MB of memory for the example images, so testing different segmentation settings is indeed viable.
+            </p>
 
 
         <h2 id="references">References</h2>
           <ol>
-            <li id="ref1">https://www.csd.uwo.ca/~yboykov/Papers/iccv01.pdf</li>
-            <li id="ref2">https://www.csd.uwo.ca/~yboykov/Papers/pami04.pdf</li>
-            <li id="ref3">(...)</li>
-            <li id="ref4">(...)</li>
-            <li id="ref5">(...)</li>
-            <li id="img1">The test image "pup.png" was obtained from a royalty-free hosting website. <a href="https://www.pixilart.com/art/puppy-5f5b2da201c4894">Created by @thebeekeep.</a>
-            <li id="img1">The test image "bird.png" was obtained from a royalty-free hosting website. <a href="https://www.pixilart.com/art/in-the-clouds-0f7bddd764d93bc">Created by @Ceru.</a>
+            <li id="ref1">Boykov, Y. Y., and M. P. Jolly. “Interactive Graph Cuts for Optimal Boundary & Region Segmentation of Objects in N-D Images.” Proceedings Eighth IEEE International Conference on Computer Vision. ICCV 2001, vol. 1, 2001, pp. 105–12 vol.1. IEEE Xplore, https://doi.org/10.1109/ICCV.2001.937505. <a href="https://www.csd.uwo.ca/~yboykov/Papers/iccv01.pdf">Source.</a></li>
+            <li id="ref2">Boykov, Y., and V. Kolmogorov. “An Experimental Comparison of Min-Cut/Max- Flow Algorithms for Energy Minimization in Vision.” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 26, no. 9, Sept. 2004, pp. 1124–37. DOI.org (Crossref), https://doi.org/10.1109/TPAMI.2004.60. <a href="https://www.csd.uwo.ca/~yboykov/Papers/pami04.pdf">Source.</a></li>
+            <li id="ref3">Boykov, Yuri, and Gareth Funka-Lea. “Graph Cuts and Efficient N-D Image Segmentation.” International Journal of Computer Vision, vol. 70, no. 2, Nov. 2006, pp. 109–31. Springer Link, https://doi.org/10.1007/s11263-006-7934-5. <a href="https://www.csd.uwo.ca/~yboykov/Papers/ijcv06.pdf">Source.</a></li>
+            <li id="ref4">Juan, O., and Y. Boykov. “Active Graph Cuts.” 2006 IEEE Computer Society Conference on Computer Vision and Pattern Recognition (CVPR’06), vol. 1, 2006, pp. 1023–29. IEEE Xplore, https://doi.org/10.1109/CVPR.2006.47. <a href="https://www.researchgate.net/publication/4246196_Active_Graph_Cuts">Source.</a></li>
+            <li id="ref5">Humayun, Ahmad, et al. “RIGOR: Reusing Inference in Graph Cuts for Generating Object Regions.” 2014 IEEE Conference on Computer Vision and Pattern Recognition, 2014, pp. 336–43. IEEE Xplore, https://doi.org/10.1109/CVPR.2014.50. <a href="https://openaccess.thecvf.com/content_cvpr_2014/papers/Humayun_RIGOR_Reusing_Inference_2014_CVPR_paper.pdf">Source.</a></li>
+            <li id="ref6">The test image "pup.png" was uploaded to a royalty-free hosting website by @thebeekeep. <a href="https://www.pixilart.com/art/puppy-5f5b2da201c4894">Source</a>.
+            <li id="ref7">The test image "bird.png" was uploaded to a royalty-free hosting website by @Ceru. <a href="https://www.pixilart.com/art/in-the-clouds-0f7bddd764d93bc">Source</a>.
           </ol>
 
       </div>
