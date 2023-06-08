@@ -37,7 +37,7 @@
           </p>
 
           <p>
-            The method described in <a href="#ref1">[1]</a> and <a href="#ref2">[2]</a> was implemented in Python and can be found <a href="https://github.com/DiegoBarqueroMorera/interactive-graph-cut-segmentation" target="_blank">here</a>. The goal of this method is to segment a 2D image into two parts (binary segmentation): <b>object</b> and <b>background</b>. A user provides a set of pixels that are certain to be part of the object, and another set of pixels certain to be part of the background. Both sets are denominated <b>seeds</b> for object and background respectively.
+            For this project, the method described in <a href="#ref1">[1]</a> and <a href="#ref2">[2]</a> was implemented in Python and can be found <a href="https://github.com/DiegoBarqueroMorera/interactive-graph-cut-segmentation" target="_blank">here</a>. The goal of this method is to segment a 2D image into two parts (binary segmentation): <b>object</b> and <b>background</b>. A user provides a set of pixels that are certain to be part of the object, and another set of pixels certain to be part of the background. Both sets are denominated <b>seeds</b> for object and background respectively.
           </p>
 
           <p>
@@ -63,7 +63,7 @@
 
             <figure>
               <img src="report-figures/n_edges.png", alt="Non-terminal edges">
-              <figcaption> Example of a 5x5 image (left) and its graph representation (right). Each node stores the original $Ip$ information and is connected to its neighbours by non-terminal edges. </figcaption>
+              <figcaption class="text-center"> Example of a 5x5 image (left) and its graph representation (right). Each node stores the original $Ip$ information and is connected to its neighbours by non-terminal edges. </figcaption>
             </figure>
 
             <p>
@@ -78,7 +78,7 @@
 
             <figure>
               <img src="report-figures/n_t_edges.png", alt="Non-terminal and terminal edges">
-              <figcaption> Example of a 5x5 image (left) and its graph representation (right). The graph is expanded by adding the terminal nodes $S$ and $T$, as well as the edges connecting them to all the nodes from $P$. </figcaption>
+              <figcaption class="text-center"> Example of a 5x5 image (left) and its graph representation (right). The graph is expanded by adding the terminal nodes $S$ and $T$, as well as the edges connecting them to all the nodes from $P$. </figcaption>
             </figure>
 
           <h3>Graph Cuts</h3>
@@ -99,7 +99,7 @@
 
             <figure>
               <img src="report-figures/cut.png", alt="Graph cut">
-              <figcaption> Example of a 5x5 image (left) and its graph representation (right). The subset of edges $C$ is removed from the graph, removing all possible paths from $S$ to $T$. </figcaption>
+              <figcaption class="text-center"> Example of a 5x5 image (left) and its graph representation (right). The subset of edges $C$ is removed from the graph, removing all possible paths from $S$ to $T$. </figcaption>
             </figure>
 
           <h3>Graph Flow</h3>
@@ -262,7 +262,7 @@
             </p>
 
             <figure>
-              <img id="fig_large" src="report-figures/bk_schema.png", alt="Schema for the BK algorithm">
+              <img class="fig2" src="report-figures/bk_schema.png", alt="Schema for the BK algorithm">
             </figure>
 
             <p>
@@ -284,8 +284,8 @@
             </p>
 
             <figure>
-              <img id="fig_small" src="report-figures/borders.png", alt="Description of Borders()">
-              <figcaption>Description of the $Borders$ function. This is a small addition to the original BK algorithm that optimizes the first iteration when large seeds are given.</figcaption>
+              <img class="fig_small" src="report-figures/borders.png", alt="Description of Borders()">
+              <figcaption class="text-center">Description of the $Borders$ function. This is a small addition to the original BK algorithm that optimizes the first iteration when large seeds are given.</figcaption>
             </figure>
 
           <h3>Growth</h3>
@@ -294,8 +294,8 @@
             </p>
 
             <figure>
-              <img id="fig_large" src="report-figures/stage_grow.png", alt="Pseudocode for the growth stage">
-              <figcaption>Pseudocode for the growth stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
+              <img class="fig2" src="report-figures/stage_grow.png", alt="Pseudocode for the growth stage">
+              <figcaption class="text-center">Pseudocode for the growth stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
             </figure>
 
           <h3>Augmentation</h3>
@@ -304,8 +304,8 @@
             </p>
 
             <figure>
-              <img id = "fig_large" src="report-figures/stage_augment.png", alt="Pseudocode for the augmentation stage">
-              <figcaption>Pseudocode for the augmentation stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
+              <img class="fig2" src="report-figures/stage_augment.png", alt="Pseudocode for the augmentation stage">
+              <figcaption class="text-center">Pseudocode for the augmentation stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
             </figure>
 
           <h3>Adoption</h3>
@@ -314,8 +314,8 @@
             </p>
 
             <figure>
-              <img id = "fig_large" src="report-figures/stage_adopt.png", alt="Pseudocode for the adoption stage">
-              <figcaption>Pseudocode for the adoption stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
+              <img class="fig2" src="report-figures/stage_adopt.png", alt="Pseudocode for the adoption stage">
+              <figcaption class="text-center">Pseudocode for the adoption stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
             </figure>
 
 
@@ -342,7 +342,7 @@
 
             <figure>
               <img src="report-figures/gui_main.png", alt="Main window of the GUI">
-              <figcaption>Main window of the GUI.</figcaption>
+              <figcaption class="text-center">Main window of the GUI.</figcaption>
             </figure>
 
             <p>
@@ -359,7 +359,7 @@
 
             <figure>
               <img src="report-gifs/GUI_seeds.gif", alt="Basic usage of the GUI">
-              <figcaption>Basic usage of the GUI.</figcaption>
+              <figcaption class="text-center">Basic usage of the GUI.</figcaption>
             </figure>
 
           <h3>Fast and Animate cut modes</h3>
@@ -373,7 +373,7 @@
 
             <figure>
               <img src="report-gifs/GUI_fast_cut.gif", alt="Performing a fast cut with the GUI">
-              <figcaption>Performing a fast cut with the GUI. The final search trees are displayed as a semitransparent red for $S_t$ and semitransparent blue for $T_t$. </figcaption>
+              <figcaption class="text-center">Performing a fast cut with the GUI. The final search trees are displayed as a semitransparent red for $S_t$ and semitransparent blue for $T_t$. </figcaption>
             </figure>
 
             <p>
@@ -386,7 +386,7 @@
 
             <figure>
               <img src="report-gifs/GUI_animate_cut.gif", alt="Performing an animated cut with the GUI">
-              <figcaption>Performing an animated cut with the GUI. The incomplete search trees follow the same color schema, while pixels crossed by $path_{ST}$ are displayed in green.</figcaption>
+              <figcaption class="text-center">Performing an animated cut with the GUI. The incomplete search trees follow the same color schema, while pixels crossed by $path_{ST}$ are displayed in green.</figcaption>
             </figure>
 
           <h3>BFS and RND cut modes</h3>
@@ -398,20 +398,30 @@
               This idea is explored by the options denominated with <b>RND</b>, which employ an alternative version of the BK algorithm that uses a random based search in the growth stage. During this stage, when picking an active node BFS always takes the first node of the ordered array $A$, while RND chooses a node from a different random index each time. For completeness, options denominated with <b>BFS</b> employ the standard BFS based algorithm.
             </p>
 
-            <figure style="display: inline">
-              <img src="report-gifs/GUI_cut_bfs.gif", alt="Animation of a BFS cut">
-              <img src="report-gifs/GUI_cut_rnd.gif", alt="Animation of a RND cut">
-              <figcaption>Comparison of the growth phase between a BFS based cut (left) and a RND based cut (right).</figcaption>
+            <figure>
+              <div class="d-flex flex-row fig3">
+                <img src="report-gifs/GUI_cut_bfs.gif", alt="Animation of a BFS cut">
+                <img src="report-gifs/GUI_cut_rnd.gif", alt="Animation of a RND cut">
+              </div>
+              <div class="row">
+                <figcaption class="text-center">Comparison of the growth phase between a BFS based cut (left) and a RND based cut (right).</figcaption>
+              </div>
             </figure>
 
             <p>
               Ideally, in some cases this might allow to find the shortest $path_{ST}$ faster and improve performance, or reduce the number of BK main loop's cycles in some other unforeseen way. However, this is by nature a highly empirical decision. For example, in the images tested for this implementation, RND appears to find some shorter paths than BFS (as observed in the figure below), but ultimately requires slightly more cycles.
             </p>
 
-            <figure style="display: inline">
-              <img src="report-figures/gui_cut_bfs.png", alt="Paths found by a BFS cut">
-              <img src="report-figures/gui_cut_rnd.png", alt="Paths found by a RND cut">
-              <figcaption>Comparison of the paths $path_{ST}$ found by a BFS based cut (left) and a RND based cut (right). BFS required 1769 cut cycles while RND required 1794 cycles.</figcaption>
+            <figure>
+              <div class="d-flex flex-row fig3">
+                <img class="col px-2" src="report-figures/gui_cut_bfs.png", alt="Paths found by a BFS cut">
+              <img class="col px-2" src="report-figures/gui_cut_rnd.png", alt="Paths found by a RND cut">
+
+              </div>
+              <div class="row">
+                <figcaption class="text-center">Comparison of the paths $path_{ST}$ found by a BFS based cut (left) and a RND based cut (right). BFS required 1769 cut cycles while RND required 1794 cycles.</figcaption>
+
+              </div>
             </figure>
 
           <h3>Additional Details</h3>
@@ -420,8 +430,8 @@
             </p>
 
             <figure>
-              <img id="fig_large" src="report-figures/penalties_Rp.png", alt="Rp penalties">
-              <figcaption>Representation of the penalty values for edges connecting to the source ("Rp bck") and to the sink ("Rp obj"). Darker values represent higher edge costs.</figcaption>
+              <img class="col px-2 fig_large" src="report-figures/penalties_Rp.png", alt="Rp penalties">
+              <figcaption class="text-center">Representation of the penalty values for edges connecting to the source ("Rp bck") and to the sink ("Rp obj"). Darker values represent higher edge costs.</figcaption>
             </figure>
 
             <p>
@@ -433,10 +443,14 @@
             </p>
 
 
-            <figure style="display: inline">
-              <img id="fig_large" src="report-figures/penalties_Bp_before.png", alt="Bp penalties (before)">
-              <img id="fig_large" src="report-figures/penalties_Bp_after.png", alt="Bp penalties (after)">
-              <figcaption>Representation of the penalty values for edges connecting neighbours on the four different directions. Values before (left) and after (right) the cut can be compared. Darker values represent higher edge costs.</figcaption>
+            <figure >
+              <div class="d-flex flex-row fig3">
+                <img class="col px-2 fig_large" src="report-figures/penalties_Bp_before.png", alt="Bp penalties (before)">
+                <img class="col px-2 fig_large" src="report-figures/penalties_Bp_after.png", alt="Bp penalties (after)">
+              </div>
+              <div class="row">
+                <figcaption class="text-center">Representation of the penalty values for edges connecting neighbours on the four different directions. Values before (left) and after (right) the cut can be compared. Darker values represent higher edge costs.</figcaption>
+              </div>
             </figure>
 
           <h3>Examples of Usage</h3>
@@ -449,38 +463,58 @@
               </small>
             </p>
 
-            <figure style="display: inline">
-              <img src="test-images/pup.png", alt="Example image: Simple illustration">
-              <img src="test-images/bird.png", alt="Example image: More detailed illustration">
-              <img src="test-images/fluff.png", alt="Example image: Photography">
-              <figcaption>Test images presented as examples for the segmentation, with different levels of complexity: left) a simple 304x304 illustration <a href="#ref6">[6]</a>, middle) a more detailed 414x354 illustration <a href="#ref7">[7]</a>, right) a 362x262 photography.</figcaption>
+            <figure>
+              <div class="d-flex flex-row fig3">
+                <img class="col px-2 img3" src="test-images/pup.png" alt="Example image: Simple illustration">
+                <img class="col px-2 img3" src="test-images/bird.png" alt="Example image: More detailed illustration">
+                <img class="col px-2 img3" src="test-images/fluff.png" alt="Example image: Photography">
+              </div>
+              <div class="row">
+                <figcaption class="text-center">Test images presented as examples for the segmentation, with different levels of complexity: left) a simple 304x304 illustration <a href="#ref6">[6]</a>, middle) a more detailed 414x354 illustration <a href="#ref7">[7]</a>, right) a 362x262 photography.</figcaption>
+              </div>
             </figure>
 
-            <figure style="display: inline">
-              <img src="report-figures/pup_seeds.png", alt="Seeded image: Simple illustration">
-              <img src="report-figures/bird_seeds.png", alt="Seeded image: More detailed illustration">
-              <img src="report-figures/fluff_seeds.png", alt="Seeded image: Photography">
-              <figcaption>Sets of seeds used for each image.</figcaption>
+            <figure>
+            <div class="d-flex flex-row fig3">
+              <img class="col px-2 img3" src="report-figures/pup_seeds.png" alt="Seeded image: Simple illustration">
+              <img class="col px-2 img3" src="report-figures/bird_seeds.png" alt="Seeded image: More detailed illustration">
+              <img class="col px-2 img3" src="report-figures/fluff_seeds.png" alt="Seeded image: Photography">
+            </div>
+            <div class="row">
+              <figcaption class="text-center">Sets of seeds used for each image.</figcaption>
+            </div>
             </figure>
 
-            <figure style="display: inline">
-              <img src="test-images/pup-OBJ-BFS-S0.01-L0.2-cycles_1769.png", alt="Result of the segmentation (object)">
-              <img src="test-images/pup-BKG-BFS-S0.01-L0.2-cycles_1769.png", alt="Result of the segmentation (background)">
-              <figcaption>Result of the segmentation ($\sigma = 0.01, \lambda = 0.2$): left) object, right) background.</figcaption>
+            <figure>
+            <div class="d-flex flex-row fig3">
+              <img class="col px-2 img3" src="report-figures/pup-OBJ.png", alt="Result of the segmentation (object)">
+              <img class="col px-2 img3" src="report-figures/pup-BKG.png", alt="Result of the segmentation (background)">
+            </div>
+            <div class="row">
+              <figcaption class="text-center">Result of the segmentation ($\sigma = 0.01, \lambda = 0.2$): left) object, right) background.</figcaption>
+            </div>
             </figure>
 
-            <figure style="display: inline">
-              <img src="test-images/bird-OBJ-BFS-S0.1-L0.2-cycles_11568.png", alt="Result of the segmentation (sigma = 0.1)">
-              <img src="test-images/bird-OBJ-BFS-S0.01-L0.2-cycles_3797.png", alt="Result of the segmentation (sigma = 0.01)">
-              <img src="test-images/bird-OBJ-BFS-S0.001-L0.2-cycles_33.png", alt="Result of the segmentation (sigma = 0.001)">
-              <figcaption>Result of the segmentation under different parameter values (constant $\lambda = 0.2$): left) $\sigma = 0.1$, middle) $\sigma = 0.01$, right) $\sigma = 0.001$.</figcaption>
+            <figure>
+            <div class="d-flex flex-row fig3">
+              <img class="col px-2 img3" src="report-figures/bird-S0.1.png", alt="Result of the segmentation (sigma = 0.1)">
+              <img class="col px-2 img3" src="report-figures/bird-S0.01.png", alt="Result of the segmentation (sigma = 0.01)">
+              <img class="col px-2 img3" src="report-figures/bird-S0.001.png", alt="Result of the segmentation (sigma = 0.001)">
+            </div>
+            <div class="row">
+              <figcaption class="text-center">Result of the segmentation under different parameter values (constant $\lambda = 0.2$): left) $\sigma = 0.1$, middle) $\sigma = 0.01$, right) $\sigma = 0.001$.</figcaption>
+            </div>
             </figure>
 
-            <figure style="display: inline">
-              <img src="test-images/fluff-OBJ-BFS-S0.5-L0.2-cycles_38987.png", alt="Result of the segmentation (sigma = 0.5)">
-              <img src="test-images/fluff-OBJ-BFS-S0.1-L0.2-cycles_12188.png", alt="Result of the segmentation (sigma = 0.1)">
-              <img src="test-images/fluff-OBJ-BFS-S0.001-L0.2-cycles_0.png", alt="Result of the segmentation (sigma = 0.001)">
-              <figcaption>Result of the segmentation under different parameter values (constant $\lambda = 0.2$): left) $\sigma = 0.5$, middle) $\sigma = 0.1$, right) $\sigma = 0.001$.</figcaption>
+            <figure>
+            <div class="d-flex flex-row fig3">
+              <img class="col px-2 img3" src="report-figures/fluff-S0.5.png", alt="Result of the segmentation (sigma = 0.5)">
+              <img class="col px-2 img3" src="report-figures/fluff-S0.1.png", alt="Result of the segmentation (sigma = 0.1)">
+              <img class="col px-2 img3" src="report-figures/fluff-S0.001.png", alt="Result of the segmentation (sigma = 0.001)">
+            </div>
+            <div class="row">
+              <figcaption class="text-center">Result of the segmentation under different parameter values (constant $\lambda = 0.2$): left) $\sigma = 0.5$, middle) $\sigma = 0.1$, right) $\sigma = 0.001$.</figcaption>
+            </div>
             </figure>
 
             <p>
