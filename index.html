@@ -399,9 +399,9 @@
             </p>
 
             <figure>
-              <div class="d-flex flex-row fig3">
-                <img src="report-gifs/GUI_cut_bfs.gif", alt="Animation of a BFS cut">
-                <img src="report-gifs/GUI_cut_rnd.gif", alt="Animation of a RND cut">
+              <div class="d-flex flex-row fig_hscroll">
+                <img class="col px-2" src="report-gifs/GUI_cut_bfs.gif", alt="Animation of a BFS cut">
+                <img class="col px-2" src="report-gifs/GUI_cut_rnd.gif", alt="Animation of a RND cut">
               </div>
               <div class="row">
                 <figcaption class="text-center">Comparison of the growth phase between a BFS based cut (left) and a RND based cut (right).</figcaption>
@@ -413,14 +413,12 @@
             </p>
 
             <figure>
-              <div class="d-flex flex-row fig3">
+              <div class="d-flex flex-row fig_hscroll">
                 <img class="col px-2" src="report-figures/gui_cut_bfs.png", alt="Paths found by a BFS cut">
-              <img class="col px-2" src="report-figures/gui_cut_rnd.png", alt="Paths found by a RND cut">
-
+                <img class="col px-2" src="report-figures/gui_cut_rnd.png", alt="Paths found by a RND cut">
               </div>
               <div class="row">
                 <figcaption class="text-center">Comparison of the paths $path_{ST}$ found by a BFS based cut (left) and a RND based cut (right). BFS required 1769 cut cycles while RND required 1794 cycles.</figcaption>
-
               </div>
             </figure>
 
@@ -430,8 +428,12 @@
             </p>
 
             <figure>
-              <img class="col px-2 fig_large" src="report-figures/penalties_Rp.png", alt="Rp penalties">
-              <figcaption class="text-center">Representation of the penalty values for edges connecting to the source ("Rp bck") and to the sink ("Rp obj"). Darker values represent higher edge costs.</figcaption>
+              <div class="d-flex flex-row fig_hscroll">
+                <img class="col px-2 fig2" src="report-figures/penalties_Rp.png", alt="Rp penalties">
+              </div>
+              <div class="row">
+                <figcaption class="text-center">Representation of the penalty values for edges connecting to the source ("Rp bck") and to the sink ("Rp obj"). Darker values represent higher edge costs.</figcaption>
+              </div>
             </figure>
 
             <p>
@@ -444,12 +446,12 @@
 
 
             <figure >
-              <div class="d-flex flex-row fig3">
-                <img class="col px-2 fig_large" src="report-figures/penalties_Bp_before.png", alt="Bp penalties (before)">
-                <img class="col px-2 fig_large" src="report-figures/penalties_Bp_after.png", alt="Bp penalties (after)">
+              <div class="d-flex flex-row fig_hscroll">
+                <img class="col px-2 img3 fig2alt" src="report-figures/penalties_Bp_before.png", alt="Bp penalties (before)">
+                <img class="col px-2 img3 fig2alt" src="report-figures/penalties_Bp_after.png", alt="Bp penalties (after)">
               </div>
               <div class="row">
-                <figcaption class="text-center">Representation of the penalty values for edges connecting neighbours on the four different directions. Values before (left) and after (right) the cut can be compared. Darker values represent higher edge costs.</figcaption>
+                <figcaption class="text-center">Representation of the penalty values for edges connecting neighbours on the four different directions. Values before (2x2 grid left) and after (2x2 grid right) the cut can be compared. Darker values represent higher edge costs.</figcaption>
               </div>
             </figure>
 
@@ -464,7 +466,7 @@
             </p>
 
             <figure>
-              <div class="d-flex flex-row fig3">
+              <div class="d-flex flex-row fig_hscroll">
                 <img class="col px-2 img3" src="test-images/pup.png" alt="Example image: Simple illustration">
                 <img class="col px-2 img3" src="test-images/bird.png" alt="Example image: More detailed illustration">
                 <img class="col px-2 img3" src="test-images/fluff.png" alt="Example image: Photography">
@@ -475,7 +477,7 @@
             </figure>
 
             <figure>
-            <div class="d-flex flex-row fig3">
+            <div class="d-flex flex-row fig_hscroll">
               <img class="col px-2 img3" src="report-figures/pup_seeds.png" alt="Seeded image: Simple illustration">
               <img class="col px-2 img3" src="report-figures/bird_seeds.png" alt="Seeded image: More detailed illustration">
               <img class="col px-2 img3" src="report-figures/fluff_seeds.png" alt="Seeded image: Photography">
@@ -486,7 +488,7 @@
             </figure>
 
             <figure>
-            <div class="d-flex flex-row fig3">
+            <div class="d-flex flex-row fig_hscroll">
               <img class="col px-2 img3" src="report-figures/pup-OBJ.png", alt="Result of the segmentation (object)">
               <img class="col px-2 img3" src="report-figures/pup-BKG.png", alt="Result of the segmentation (background)">
             </div>
@@ -496,7 +498,7 @@
             </figure>
 
             <figure>
-            <div class="d-flex flex-row fig3">
+            <div class="d-flex flex-row fig_hscroll">
               <img class="col px-2 img3" src="report-figures/bird-S0.1.png", alt="Result of the segmentation (sigma = 0.1)">
               <img class="col px-2 img3" src="report-figures/bird-S0.01.png", alt="Result of the segmentation (sigma = 0.01)">
               <img class="col px-2 img3" src="report-figures/bird-S0.001.png", alt="Result of the segmentation (sigma = 0.001)">
@@ -507,7 +509,7 @@
             </figure>
 
             <figure>
-            <div class="d-flex flex-row fig3">
+            <div class="d-flex flex-row fig_hscroll">
               <img class="col px-2 img3" src="report-figures/fluff-S0.5.png", alt="Result of the segmentation (sigma = 0.5)">
               <img class="col px-2 img3" src="report-figures/fluff-S0.1.png", alt="Result of the segmentation (sigma = 0.1)">
               <img class="col px-2 img3" src="report-figures/fluff-S0.001.png", alt="Result of the segmentation (sigma = 0.001)">
@@ -519,7 +521,6 @@
 
             <p>
               As expected, the results can vary drastically when changing $\sigma$. Reducing it makes the boundary penalty more strict, which can lead to more aggresive cuts and granularity in the results. On the other hand, increasing it relaxes the penalty, which can potentially disrupt how $Bp$ and $Rp$ relate when finding the max-flow and lead to erroneous segmentations.
-
             </p>
 
             <p>

@@ -85,7 +85,8 @@ img {
 figure{
   margin: 2rem !important;
   display: flex; flex-direction: column;
-  justify-content: center; align-items: center;
+  /* justify-content: center; */
+  align-items: center;
 }
 figcaption{
   margin-top: .8rem;
@@ -105,13 +106,15 @@ b{
   object-fit: contain;
 }
 .img3{ max-width: 100%;}
-.fig3{
+.fig_hscroll{
   display: flex;
   flex-direction: row;
-  justify-content: center; align-items: center;
+  /* justify-content: center; */
+  align-items: center;
   overflow-x: scroll;
   flex-wrap: nowrap;
 }
 .fig_large { max-width: 50%;}
-.fig2{  max-width: 600px;}
+.fig2{ max-width: 600px;}
+.fig2alt{ max-height: 600px;}
 .fig_small {  max-width: 300px;}
