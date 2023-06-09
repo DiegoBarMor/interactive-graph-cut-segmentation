@@ -173,7 +173,7 @@ class GUI:
         if self.gui_mode == MOVE: return
         if points is None: return
 
-        xc, yc, x0, x1, y0, y1 = points
+        xc, yc, x0, x1, y0, y1 = map(int, points)
         w,h,_ = self.im_arr[key][y0:y1, x0:x1].shape
 
         ids = np.indices((h, w), dtype = float).T
