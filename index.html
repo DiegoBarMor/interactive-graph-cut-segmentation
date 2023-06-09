@@ -37,7 +37,7 @@
           </p>
 
           <p>
-            For this project, the method described in <a href="#ref1">[1]</a> and <a href="#ref2">[2]</a> was implemented in Python and can be found <a href="https://github.com/DiegoBarqueroMorera/interactive-graph-cut-segmentation" target="_blank">here</a>. The goal of this method is to segment a 2D image into two parts (binary segmentation): <b>object</b> and <b>background</b>. A user provides a set of pixels that are certain to be part of the object, and another set of pixels certain to be part of the background. Both sets are denominated <b>seeds</b> for object and background respectively.
+            For this project, the method described in <a href="#ref1">[1]</a> and <a href="#ref2">[2]</a> was implemented in Python (available <a href="https://github.com/DiegoBarqueroMorera/interactive-graph-cut-segmentation" target="_blank">here</a>). The goal of this method is to segment a 2D image into two parts (binary segmentation): <b>object</b> and <b>background</b>. A user provides a set of pixels that are certain to be part of the object, and another set of pixels certain to be part of the background. Both sets are denominated <b>seeds</b> for object and background respectively.
           </p>
 
           <p>
@@ -83,14 +83,14 @@
 
           <h3>Graph Cuts</h3>
             <p>
-              Given a set of nodes $A = \{a_1, \dots, a_n\}$, a <b>path</b> is a sequence of edges that allows to traverse from $a_1$ to $a_n$. A path that starts in the source and finished at the sink will be denominated here as $path_{St}$. A generic path can be defined as
+              Given a set of nodes $A = \{a_1, \dots, a_n\}$, a <b>path</b> is a sequence of edges that allows to traverse from $a_1$ to $a_n$. A path that starts in the source and finishes at the sink will be denominated here as $path_{St}$. A generic path can be defined as
               $$Path = \bigcup_i^{n-1} \{a_i, a_{i+1}\}$$
 
-              A <b>cut</b> is a subset of edges $C \subset E$ such that in the graph $G' = (V, E \backslash C)$ there is no path between the terminal nodes $S$ and $T$. Alternatively, it can be seen as the graph being separated into two sub-graphs, where all the nodes from a given subgraph is only connected to the same terminal node
+              A <b>cut</b> is a subset of edges $C \subset E$ such that in the graph $G' = \langle V, E \backslash C \rangle$ there is no path between the terminal nodes $S$ and $T$. Alternatively, it can be seen as the graph being separated into two sub-graphs, where all the nodes from a given subgraph are only connected to the same terminal node
               $$
                 G' = G_S \cup G_T \\
                 G_S = \langle V_S, E_n' \bigcup_{p \in P_S} \{(S,p)\} \rangle \\
-                G_T = \langle V_T, E_n' \bigcup_{p \in P_T} \{(p,T)\} \rangle
+                G_T = \langle V_T, E_n'' \bigcup_{p \in P_T} \{(p,T)\} \rangle
               $$
 
               Finally, the <b>cost</b> of the cut is defined as the sum of the weights of the edges it comprises
@@ -112,18 +112,18 @@
             </p>
 
             <ul>
-              <li><b>Flow</b> ($flow \ge 0$): The amount of water currently pushed through an edge. This value remains constant</li>
-              <li><b>Capacity</b> ($cap \ge 0$): How much water is supported by an edge</li>
-              <li><b>Residual</b> capacity ($res \ge 0$): The capacity left after pushing a certain amount of flow through the edge, given by $res = cap - flow$</li>
+              <li><b>Flow</b> ($flow \ge 0$): The amount of water currently pushed through an edge. This value remains constant.</li>
+              <li><b>Capacity</b> ($cap \ge 0$): How much water is supported by an edge.</li>
+              <li><b>Residual</b> capacity ($res \ge 0$): The capacity left after pushing a certain amount of flow through the edge, given by $res = cap - flow$.</li>
             </ul>
 
             <p>
-              Note the at any given moment the flow going through an edge can't exceed its capacity, so  $flow \le cap \implies res \ge 0$. In the specific case when $flow = edge \implies res = 0$, it is said that the edge is <b>saturated</b>, meaning that it is moving the maximum amount of water it can handle. Similarly, a <b>saturated path</b> is a path where one or more edges are saturated. For the purposes of this method, all edges composing a cut must be saturated.
+              Note the at any given moment the flow going through an edge can't exceed its capacity, so  $flow \le cap \implies res \ge 0$. In the specific case when $flow = cap \implies res = 0$, it is said that the edge is <b>saturated</b>, meaning that it is moving the maximum amount of water it can handle. Similarly, a <b>saturated path</b> is a path where one or more edges are saturated. For the purposes of this method, all edges composing a cut must be saturated.
             </p>
 
           <h3>Optimal Cut</h3>
             <p>
-              The idea of defining all of this concepts is to find a way to measure a given image segmentation. Such measure is to be optimized via an automatic algorithm, in order to choose the best image segmentation from the space of all possible segmentations.
+              The idea of defining all of these concepts is to find a way to quantitatively measure a given image segmentation. Such measure is to be optimized via an automatic algorithm, in order to choose the best image segmentation from the space of all possible segmentations.
             </p>
 
             <p>
@@ -138,14 +138,13 @@
             </p>
 
             <p>
-              For minimizing the energy and thus obtain the optimal cut, the <b>max-flow min-cut</b> theorem can be exploited. This theorem states that the maximum flow from $S$ to $T$ saturates a set of edges $C^*$ that correspond to the minimum cut, leaving behind two disjoint subgraphs $G_S$ and $G_T$. The objective of many graph based segmentation methods is to take advantage on this duality property and find the maximum flow of the system, which guarantees the minimum cut and the optimal segmentation given the inputs.
+              For minimizing the energy and thus obtain the optimal cut, the <b>max-flow min-cut</b> theorem can be exploited. This theorem states that the maximum flow from $S$ to $T$ saturates a set of edges $C^*$ that correspond to the minimum cut, leaving behind two disjoint subgraphs $G_S$ and $G_T$. The objective of many graph based segmentation methods is to take advantage on this duality property and find the maximum flow of the system, which guarantees the minimum cut and therefore the optimal segmentation given the inputs.
             </p>
 
 
         <h2 id="graph">Graph Preparation</h2>
           <p>
-            First, the pixels from the image are mapped into nodes and edges of a graph.
-            After mapping the pixels of the image into the nodes and edges of a graph, assigning weights to the edges requires an energy function to be defined. For this implementation, the energy functions were inspired by <a href="#ref1">[1]</a>. Consider $Obj \in P$ the subset of pixels marked as a seed for object and $Bkg \in P$ the pixels marked as a seed for background. Then, the energy functions consist of
+            After mapping the pixels of the image into the nodes and edges of a graph, assigning weights to the edges requires energy functions to be defined. For this implementation, the energy functions were inspired by <a href="#ref1">[1]</a>. Consider $Obj \in P$ the subset of pixels marked as a seed for object and $Bkg \in P$ the pixels marked as a seed for background. Then, the energy functions consist of
             $$
               Bp(p, q) = \exp(-\frac{(Ip - Iq)^2}{2 \sigma^2})\\
               Rp_{obj}(p) = -\ln(\Pr(Ip | Obj)) \\
@@ -210,29 +209,30 @@
           </p>
 
           <p>
-            Pixels that are marked as seeds take this to the extreme, by assigning $0$ to their opposite seed, marking them as cut by default. On the contrary, a very high constant $K$ is assigned to the weight of their corresponding seed, making the cut unfeasible under all circumstances. This could also be adjusted to $K = \infty$ if desired.
+            Pixels that are marked as seeds take this to the extreme, by assigning $0$ to their opposite seed, cutting the edge by default since the very beginning. On the contrary, a very high constant $K$ is assigned to the weight of their corresponding seed, making the cut unfeasible under all circumstances. This could also be adjusted to $K = \infty$ if desired.
           </p>
 
 
         <h2 id="algorithm">Boykov-Kolmogorov Algorithm</h2>
-          <p>
-            Once the graph is initialized, different algorithms can be used to find the max-flow. For this implementation, an <i>augmenting path</i> based algorithm described in <a href="#ref2">[2]</a> was employed, which will continue to be described as the <b>BK algorithm</b>.
-          </p>
+          <h3>Motivation</h3>
+            <p>
+              Once the graph is initialized, different algorithms can be used to find the max-flow. For this implementation, an <i>augmenting path</i> based algorithm described in <a href="#ref2">[2]</a> was employed, which will continue to be described as the <b>BK algorithm</b>.
+            </p>
 
-          <p>
-            Traditionally, augmenting path algorithms iteratively look for the shortest paths from the source to the sink ($path_{ST}$), having to start the search process if time that all the paths of a given length are exhausted (i.e. they become saturated). The BK algorithm seeks to improve performance of other push-relabel methods by optimizing the step where $path_{ST}$ is searched, by reusing paths from previous iterations.
-          </p>
+            <p>
+              Traditionally, augmenting path algorithms iteratively look for the shortest paths from the source to the sink ($path_{ST}$), having to start the search process each time that all the paths of a given length are exhausted (i.e. they become saturated). The BK algorithm seeks to improve performance of other push-relabel methods by optimizing the step where $path_{ST}$ is searched, by reusing paths from previous iterations.
+            </p>
 
-          <p>
-            The basic idea is to build two separate non-overlapping search trees, one starting from $S$ and the other from $T$. These trees are grown (via, for example, breadth first search), and whenever they touch, a $path_{ST}$ is found. Note that this path is not necessarily the shortest path possible. After using the $path_{ST}$, the trees are shortened in a particular way, so in next iterations the modified trees are taken as starting point and grown.
-          </p>
+            <p>
+              The basic idea is to build two separate non-overlapping search trees, one starting from $S$ and the other from $T$. These trees are grown (via, for example, breadth first search), and whenever they touch, a $path_{ST}$ is found. Note that this path is not necessarily the shortest path possible. After using the $path_{ST}$, the trees are shortened in a particular way, so in next iterations the modified trees are taken as starting point and grown.
+            </p>
 
           <h3>Overview</h3>
             <p>
-              At any given moment, two search trees occupy nodes from $P$: $S_t$ having as root the source and $T_t$ having as root the sink. The nodes not present in $S_t \cup T_t$ are said to be "free", and can be grouped as $F$. Therefore
+              At any given moment, two non-overlapping search trees occupy nodes from $P$: $S_t$ having as root the source and $T_t$ having as root the sink. The nodes not present in $S_t \cup T_t$ are said to be "free", and can be grouped as $F$. Therefore
               $$S_t \subset V, \quad T_t \subset V, \quad F \subset N, \quad S_t \cup T_t \cup F = V \\ S_t \cap T_t = T_t \cap F = F \cap S_t = \emptyset$$
 
-              This algorithm is based on a directed graph, so order of edges does matter. For any given edge $E = (p,q)$ of a tree, a <b>parent-child</b> relationship can be defined according to the tree it belongs to. Furthermore, any edge covered by a search tree must be unsaturated.
+              This algorithm is based on a directed graph, so order of edges does matter. For any given edge $E = (p,q)$ of a tree, a <b>parent-child</b> relationship can be defined according to which tree it belongs to. Furthermore, any edge covered by a search tree must be unsaturated.
             </p>
 
             <table class="tg">
@@ -290,7 +290,7 @@
 
           <h3>Growth</h3>
             <p>
-              This stage is summarized by <a href="#ref2">[2]</a> as: "search trees [$S_t$] and [$T_t$] grow until they touch giving a [$path_{ST}$]". This is the stage where active nodes try to recruit new free nodes, until all active nodes are depleted. It returns a $path_{st}$ if it finds one, otherwise the stage loop ends and $path_{st}$ is returned as $\emptyset$. This halts the BK algorithm main loop, indicating that the optimal cut was found.
+              This stage is summarized by <a href="#ref2">[2]</a> as: "search trees [$S_t$] and [$T_t$] grow until they touch giving a [$path_{ST}$]". This is the stage where active nodes try to recruit new free nodes, until all active nodes are depleted. It returns a $path_{ST}$ if it finds one, otherwise the stage loop ends and $path_{ST}$ is returned as $\emptyset$. This halts the BK algorithm main loop, indicating that the optimal cut was found.
             </p>
 
             <figure>
@@ -368,7 +368,7 @@
             </p>
 
             <p>
-              Once the segmentation is obtained, the result is portrayed on top of the displayed image. This representation can be toggled on or off, while the result itself can be saved as an image, either just the object (<b>Save OBJ</b>) or just the background (<b>Save OBJ</b>). Note that the algorithm yields a <b>mask</b>, which is used to save a segmentation of the original image and not its black and white representation.
+              Once the segmentation is obtained, the result is portrayed on top of the displayed image. This representation can be toggled on or off, while the result itself can be saved as an image, either just the object (<b>Save OBJ</b>) or just the background (<b>Save BKG</b>). Note that the algorithm yields a <b>mask</b>, which is used to save a segmentation of the original image and not its black and white representation.
             </p>
 
             <figure>
@@ -441,7 +441,7 @@
             </p>
 
             <p>
-              Note that in the plots for the state <i>before</i> the cut, <b>boundaries</b> of high costs can be observed in sections where there is a drastic change of $Ip$ value. These boundaries are either vertical or horizontal, following the direction of the neighbouring relationship. Furthermore, it can be observed that many new perpendicular "borders" are generated after the cut. These are from pixels that belonged to one or more $path_{ST}$ and got saturated through the BK algorithm.
+              Note that in the plots for the state <i>before</i> the cut, <b>boundaries</b> of high costs can be observed in sections where there is a drastic change of $Ip$ value. These boundaries are either vertical or horizontal, depending on the direction of the neighbouring relationship. Furthermore, it can be observed that many new perpendicular "borders" are generated after the cut. These are from pixels that belonged to one or more $path_{ST}$ and got saturated through the BK algorithm.
             </p>
 
 
@@ -457,11 +457,11 @@
 
           <h3>Examples of Usage</h3>
             <p>
-              Three simple images were used to test the graph-cut algorithm, with different degrees of complexity. The same set of seeds was used for a given image when obtaining different results. Below are some examples of usage under different values of $\sigma$.
+              Three simple images<small>*</small> with different degrees of complexity were used to test the graph-cut algorithm. The same set of seeds was used for a given image when obtaining different results. Below are some examples of usage under different values of $\sigma$.<small>**</small>
 
               <br><small>
                 * For this implementation, it is recommended to use images with less than one million pixels to retain performance, specially if performing animations. <br>
-                ** Due to a bug, changing $\lambda$ doesn't affect the result. This is to be fixed in the future.
+                ** Due to lack of clarity from different sources on how to implement BK, this implementation has a bug where changing $\lambda$ doesn't affect the result. This is to be fixed in the future.
               </small>
             </p>
 

@@ -9,11 +9,11 @@ This implementation is written in Python 3. It aims to be highly portable, so it
 - [psutil](https://pypi.org/project/psutil/) for benchmarking the amount of memory required by the program.
 
 ## Example of usage
-Basic usage of the GUI:
+##### Basic usage of the GUI
 ![Basic usage of the GUI](report-gifs/GUI_seeds.gif)
 
-Performing a fast cut with the GUI:
+##### Performing a fast cut with the GUI
 ![Performing a fast cut with the GUI](report-gifs/GUI_fast_cut.gif)
 
-Performing an animated cut with the GUI:
+##### Performing an animated cut with the GUI
 ![Performing an animated cut with the GUI](report-gifs/GUI_animate_cut.gif)
