@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 
+from parameters import CMAP_DETAILS
 from GUI_main import GUI
 
 ################################################################################
@@ -11,12 +12,12 @@ class GUIDetails(GUI):
         self.fig_details = plt.figure(layout = "constrained")
         self.ax_dict_details = self.fig_details.subplot_mosaic("xaabbee;xccddff")
         self.implot_details = {
-            "Bp_l" : self.ax_dict_details['a'].imshow(self.im_arr["main"] / 255, vmin = 0, vmax = 1, cmap = "hot_r"),
-            "Bp_r" : self.ax_dict_details['b'].imshow(self.im_arr["main"] / 255, vmin = 0, vmax = 1, cmap = "hot_r"),
-            "Bp_t" : self.ax_dict_details['c'].imshow(self.im_arr["main"] / 255, vmin = 0, vmax = 1, cmap = "hot_r"),
-            "Bp_b" : self.ax_dict_details['d'].imshow(self.im_arr["main"] / 255, vmin = 0, vmax = 1, cmap = "hot_r"),
-            "Rp_obj" : self.ax_dict_details['e'].imshow(self.im_arr["main"] / 128, vmin = 0, vmax = 2, cmap = "hot_r"),
-            "Rp_bkg" : self.ax_dict_details['f'].imshow(self.im_arr["main"] / 128, vmin = 0, vmax = 2, cmap = "hot_r"),
+            "Bp_l" : self.ax_dict_details['a'].imshow(self.im_arr["main"] / 255, vmin = 0, vmax = 1, cmap = CMAP_DETAILS),
+            "Bp_r" : self.ax_dict_details['b'].imshow(self.im_arr["main"] / 255, vmin = 0, vmax = 1, cmap = CMAP_DETAILS),
+            "Bp_t" : self.ax_dict_details['c'].imshow(self.im_arr["main"] / 255, vmin = 0, vmax = 1, cmap = CMAP_DETAILS),
+            "Bp_b" : self.ax_dict_details['d'].imshow(self.im_arr["main"] / 255, vmin = 0, vmax = 1, cmap = CMAP_DETAILS),
+            "Rp_obj" : self.ax_dict_details['e'].imshow(self.im_arr["main"] / 128, vmin = 0, vmax = 2, cmap = CMAP_DETAILS),
+            "Rp_bkg" : self.ax_dict_details['f'].imshow(self.im_arr["main"] / 128, vmin = 0, vmax = 2, cmap = CMAP_DETAILS),
         }
         self.ax_dict_details['a'].set_title("Bp left")
         self.ax_dict_details['b'].set_title("Bp right")

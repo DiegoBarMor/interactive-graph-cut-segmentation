@@ -7,7 +7,7 @@ def prompt_select_file():
     filePath = filedialog.askopenfilename(
         initialdir = root,
         title = "Choose an image...",
-        filetypes = [
+        filetypes = [ # filetypes supported by Pillow
             ("All files", "*.*"),
             ("BLP", "*.blp"),
             ("BMP image/bmp", "*.bmp"),

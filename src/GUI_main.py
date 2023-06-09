@@ -5,13 +5,14 @@ from PIL import Image, UnidentifiedImageError
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button, RadioButtons, TextBox
 
+from parameters import BRUSH_RADIUS, DEFAULT_SIGMA, DEFAULT_LAMBDA
 from utilities import prompt_select_file
 from mincut_maxflow import SOURCE, SINK, \
     GraphCutFastBFS, \
     GraphCutFastRND, \
     GraphCutAnimateBFS, \
     GraphCutAnimateRND
-    
+
 ################################################################################
 ##### gui colors
 NO_COLOR = 0, 0, 0, 0
@@ -27,11 +28,6 @@ MOVE = 0
 DRAW = 1
 ERASE = 2
 
-##### default gui parameters
-BRUSH_RADIUS = 10
-DEFAULT_SIGMA = .1  # .01, .2, .5, 1
-DEFAULT_LAMBDA = .2  # .001
-
 # //////////////////////////////////////////////////////////////////////////////
 class GUI:
     def __init__(self):
@@ -46,13 +42,11 @@ class GUI:
         self.path_img = Path(prompt_select_file())
 
         if not self.path_img.name:
-            print("XXX No image file selected. Exiting...")
-            exit()
+            raise Exception("No image file selected. Exiting...")
         try:
             self.img = Image.open(self.path_img)
         except UnidentifiedImageError:
-            print(f"XXX Invalid image file '{self.path_img.name}' selected. Exiting...")
-            exit()
+            raise Exception(f"Invalid image file '{self.path_img.name}' selected. Exiting...")
         else:
             self.path_base = self.path_img.parent / self.path_img.stem
             self.path_seeds = Path(str(self.path_base) + "-seeds.png")
@@ -151,11 +145,14 @@ class GUI:
             dtype = np.uint8
         ).copy()
         arr[~mask] *= 0
-        
+
         p = Path(path_out)
         Image.fromarray(arr).save(p)
         print(f">>> Output saved as {p.name}")
 
+    def output_name(self, type : str):
+        return f"{self.path_base}-{type}-{'RND' if self.mode_random else 'BFS'}" \
+            f"-S{self.str_sigma}-L{self.str_lambda}-cycles_{self.graph_cut.cut_cycle}.png"
 
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ GUI UTILITIES
     def get_mouse_coords(self, event):
@@ -209,7 +206,7 @@ class GUI:
     def clear_canvas(self, key):
         self.implot[key].set_data(self.blank)
         self.fleft.canvas.draw_idle()
-    
+
     def update_canvas(self, key):
         self.implot[key].set_data(self.im_arr[key])
         self.fleft.canvas.draw_idle()
@@ -217,7 +214,7 @@ class GUI:
     def update_canvas_cut(self):
         self.im_arr["result"].fill(0)
         self.im_arr["result"] = self.graph_cut.output_array()
-        
+
         path = self.graph_cut.get_array_path_ST()
         self.im_arr["result"] += path
         self.im_arr["paths"] += path
@@ -297,51 +294,43 @@ class GUI:
             self.colors["seeds"] = NO_COLOR
             self.colors["ghost"] = HALF_BLACK
             return
-    
+
         if val == "Nothing (V)":
             self.gui_mode = MOVE
             self.clear_canvas("ghost")
 
     def validate_tb_sigma(self, val):
         self.validate_textbox("sigma", val)
-    
+
     def validate_tb_lambda(self, val):
         self.validate_textbox("lambda", val)
 
-    def save_seeds(self, event): 
+    def save_seeds(self, event):
         Image.fromarray(self.im_arr["seeds"], mode = "RGBA").save(self.path_seeds)
         print(f">>> Seeds saved as {self.path_seeds.name}")
 
     def save_result_obj(self, event):
-        self.save_masked_img(
-            self.graph_cut.TREE == SOURCE, 
-            f"{self.path_base}-OBJ-{'RND' if self.mode_random else 'BFS'}" \
-                f"-S{self.str_sigma}-L{self.str_lambda}-cycles_{self.graph_cut.cut_cycle}.png"
-        )
+        self.save_masked_img( self.graph_cut.TREE == SOURCE, self.output_name("OBJ") )
 
     def save_result_bkg(self, event):
-        self.save_masked_img(
-            self.graph_cut.TREE == SINK, 
-            f"{self.path_base}-BKG-{'RND' if self.mode_random else 'BFS'}" \
-                f"-S{self.str_sigma}-L{self.str_lambda}-cycles_{self.graph_cut.cut_cycle}.png"
-        )
+        self.save_masked_img( self.graph_cut.TREE == SINK, self.output_name("BKG") )
 
-    def trigger_cut_fast_bfs(self, event): 
+    def trigger_cut_fast_bfs(self, event):
         self.mode_animate = False
         self.mode_random = False
         self.start_cut(GraphCutFastBFS)
 
-    def trigger_cut_fast_rnd(self, event): 
+    def trigger_cut_fast_rnd(self, event):
         self.mode_animate = False
         self.mode_random = True
-        self.start_cut(GraphCutFastRND)    
+        self.start_cut(GraphCutFastRND)
 
-    def trigger_cut_animate_bfs(self, event): 
+    def trigger_cut_animate_bfs(self, event):
         self.mode_animate = True
         self.mode_random = False
         self.start_cut(GraphCutAnimateBFS)
 
-    def trigger_cut_animate_rnd(self, event): 
+    def trigger_cut_animate_rnd(self, event):
         self.mode_animate = True
         self.mode_random = True
         self.start_cut(GraphCutAnimateRND)
@@ -365,7 +354,7 @@ class GUI:
         if self.firstCut:
             self.firstCut = False
             self.graph_cut = cls_cut(
-                self.im_arr["main"], self.im_arr["seeds"], 
+                self.im_arr["main"], self.im_arr["seeds"],
                 float(self.str_sigma), float(self.str_lambda)
             )
             self.details_add_data()
@@ -385,7 +374,7 @@ class GUI:
         self.update_canvas_cut()
         if not must_continue: self.end_cut()
         return must_continue
-    
+
 
     def end_cut(self):
         self.showing_result = True
@@ -397,10 +386,10 @@ class GUI:
             self.activate_button("toggle_paths")
 
 
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ABSTRACT METHODS
     def details_init(self): pass
     def details_add_data(self): pass
-    
+
 
 # //////////////////////////////////////////////////////////////////////////////
 if __name__ == "__main__":

@@ -2,10 +2,11 @@ import os, time, psutil
 import numpy as np
 from collections import Counter
 
+from parameters import CYCLES_PER_FRAME, SIZE_RANDOM
 from graph import Graph, FREE, SOURCE, SINK
 
 ################################################################################
-def region_to_borders(region : np.array):
+def borders(region : np.array):
     """
     Input: binary array:
         0: exterior
@@ -37,17 +38,13 @@ def benchmark(init_time, process):
     print(f"...>>> Elapsed time: {time.time() - init_time:.2f} seconds")
     print(f"...>>> Memory used: {process.memory_info().rss / 1e6:.1f} MB")
 
-##### default cut parameters
-CYCLES_PER_FRAME = 10 # amount of cut cycles to perform before updating the GUI (Animate modes)
-SIZE_RANDOM = 100 # size of the random array (RND modes)
-
 # //////////////////////////////////////////////////////////////////////////////
 class GraphCut:
     def __init__(self, img, seeds, cut_sigma, cut_lambda):
         self.process = psutil.Process(os.getpid())
         init_time = time.time()
 
-        ######################################################################## INITIALIZATION
+        #####################
         self.cut_sigma = cut_sigma
         self.cut_lambda = cut_lambda
 
@@ -71,6 +68,7 @@ class GraphCut:
         self.mat_path_ST = np.zeros((self.w, self.h, 4), dtype = np.uint8)
 
         #####################
+        np.random.seed(0)
         self.randoms = np.random.random_integers(low = 0, high = SIZE_RANDOM, size = SIZE_RANDOM)
         self.random_i = 0
         self.cut_cycle = 0
@@ -79,7 +77,7 @@ class GraphCut:
         self.init_nonterminal_edges()
         self.init_terminal_edges()
 
-        self.node_isactive = region_to_borders(self.node_isactive)
+        self.node_isactive = borders(self.node_isactive)
         border_nodes = np.nonzero(self.node_isactive)
         self.A_nodes = [self.graph.nodes[i * self.h + j] for i,j in zip(*border_nodes)]
 
@@ -113,7 +111,6 @@ class GraphCut:
         self.OBJ_pdf /= len(obj)
 
 
-
     def init_terminal_edges(self):
         for node in self.graph.nodes:
             if self.seeds_obj[node.pos]: # pixel is part of foreground seed
@@ -139,7 +136,6 @@ class GraphCut:
                 self.graph.add_edge_sink  (node, self.penalty_Rp(self.OBJ_pdf, self.img[node.pos]))
 
 
-
     def init_nonterminal_edges(self):
         self.K = 0
         for node_0 in self.graph.nodes:
@@ -158,18 +154,14 @@ class GraphCut:
         self.K += 1
 
 
-    ########################################################################
-
     def init_nt_edge(self, node_0, node_1):
         penalty = self.penalty_Bp(self.img_norm[node_0.pos], self.img_norm[node_1.pos])
         self.graph.add_edge_nt(node_0, node_1, penalty)
         self.sum_Bp += penalty
 
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
 
     ############################################################################ ITERATION STEPS
-    def grow(self): # stage A
+    def grow(self):
         while self.A_nodes: ### while A =/= ∅
             p = self.pick_active_node() ### pick an active node p ∈ A
 
@@ -192,7 +184,7 @@ class GraphCut:
         self.path_ST.clear()
 
 
-    def augment(self): # stage B
+    def augment(self):
         ### find the bottleneck capacity ∆ on P
         bottleneck_capacity = min(self.path_ST, key = lambda edge: edge.residual).residual
 
@@ -214,7 +206,7 @@ class GraphCut:
                     self.change_branch_origin(p, FREE)
 
 
-    def adopt(self): # stage C
+    def adopt(self):
         while self.O_nodes:
             orphan = self.O_nodes.pop()
             succesful_adoption = False
@@ -280,7 +272,6 @@ class GraphCut:
             self.path_ST.append(edge)
             reverse = path_child
 
-
     def make_child(self, to_be_parent, to_be_child):
         to_be_child.parent = to_be_parent
         to_be_parent.children.append(to_be_child)
@@ -338,8 +329,8 @@ class GraphCut:
     def get_array_path_ST(self):
         self.mat_path_ST.fill(0)
         for edge in self.path_ST:
-            if edge.tail == self.graph.source: continue
-            if edge.head == self.graph.sink: continue
+            if edge.tail is self.graph.source: continue
+            if edge.head is self.graph.sink: continue
             h0,h1 = edge.head.pos
             t0,t1 = edge.tail.pos
             self.mat_path_ST[h0, h1, 1] = 255
@@ -349,7 +340,7 @@ class GraphCut:
 
         return self.mat_path_ST
 
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ABSTRACT METHODS
     def start_cut(self): pass
     def continue_cut(self): pass
     def pick_active_node(self): pass

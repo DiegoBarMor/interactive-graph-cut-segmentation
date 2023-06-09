@@ -3,7 +3,7 @@ FREE = 0
 SOURCE = 1
 SINK = 2
 
-################################################################################
+################################################################################ NODES
 class Node:
     __slots__ = ("pos", "tree", "origin", "parent", "children", "edges", "neighs")
     def __init__(self):
@@ -16,12 +16,11 @@ class Node:
             *map(str, self.edges.values())
         ])
 
-    def add_edge(self, node_head, edge):
-        self.edges[node_head.pos] = edge
+    def add_edge(self, head, edge):
+        self.edges[head.pos] = edge
 
-    def get_edge(self, node_head):
-        return self.edges[node_head.pos]
-
+    def get_edge(self, head):
+        return self.edges[head.pos]
 
 class SourceNode(Node):
     def __init__(self):
@@ -50,7 +49,7 @@ class NonTerminalNode(Node):
         self.origin = FREE
 
         self.parent = None # current parent in the search tree
-        self.children = []
+        self.children = [] # current children in the search tree
 
     def add_neighbor_edge(self, edge):
         self.neighs.append(edge)
@@ -64,7 +63,7 @@ class NonTerminalNode(Node):
             yield edge.head
 
 
-# //////////////////////////////////////////////////////////////////////////////
+# ////////////////////////////////////////////////////////////////////////////// EDGES
 class Edge:
     __slots__ = ("tail", "head", "residual")
     def __init__(self, tail, head, weight):
@@ -79,7 +78,7 @@ class Edge:
     def get_reverse(self):
         return self.head.get_edge(self.tail)
 
-# //////////////////////////////////////////////////////////////////////////////
+# ////////////////////////////////////////////////////////////////////////////// GRAPH
 class Graph:
     def __init__(self, w, h):
         self.source = SourceNode()
