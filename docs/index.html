@@ -127,10 +127,10 @@
             </p>
 
             <p>
-              Intuitively, a graph cut can be interpreted as the segmentation of the image represented by the graph. An optimal segmentation would be a cut $C$ such that the nodes from the subgraphs obtained, $N_S$ and $N_T$, correspond to pixels that most likely belong to the object and background respectively. This <b>optimal cut</b> corresponds to the cut with the lowest cost $|C|$, and is often obtained by minimizing an energy function of the general form
+              Intuitively, a graph cut can be interpreted as the segmentation of the image represented by the graph. An optimal segmentation would be a cut $C$ such that the nodes from the subgraphs obtained, $N_S$ and $N_T$, correspond to pixels that most likely belong to the object and background respectively. This <b>optimal cut</b> corresponds to the cut with the lowest cost $|C|$ and is often obtained by minimizing an energy function of the general form
               $$E(L) = \sum_{p \in P}Rp(Lp) + \sum_{(p,q) \in E_n}Bp(p, q)$$
 
-              where $L = \{L_p \in \{obj, bkg\} | p \in P\}$ is the binary labeling of the image, $Rp$ is a regional penalty function and $Bp$ a boundary penalty function.
+              where $L = \{L_p \in \{obj, bkg\} | p \in P\}$ is the binary labelling of the image, $Rp$ is a regional penalty function and $Bp$ a boundary penalty function.
             </p>
 
             <p>
@@ -333,7 +333,7 @@
 
           <h3>Basic Usage</h3>
             <p>
-              The source code of this implementation is available to download <a href="https://github.com/DiegoBarqueroMorera/interactive-graph-cut-segmentation">here</a>. Downloading <code>src/</code> is sufficient to execute the implementation, while additional test images can be downloaded from <code>test-images/</code>. The source code of this report is also available on the same repository.
+              The source code of this implementation is available to download <a href="https://github.com/DiegoBarqueroMorera/interactive-graph-cut-segmentation">here</a>. Downloading <code>src/</code> is sufficient to execute the implementation, while additional test images can be downloaded from <code>samples/</code>. The source code of this report is also available on the same repository.
             </p>
 
             <p>

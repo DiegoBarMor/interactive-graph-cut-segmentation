@@ -10,10 +10,10 @@ This implementation is written for Python 3.8 and above. It aims to be highly po
 
 ## Example of usage
 ### Basic usage of the GUI
-![Basic usage of the GUI](report-gifs/GUI_seeds.gif)
+![Basic usage of the GUI](docs/animations/GUI_seeds.gif)
 
 ### Performing a fast cut with the GUI
-![Performing a fast cut with the GUI](report-gifs/GUI_fast_cut.gif)
+![Performing a fast cut with the GUI](docs/animations/GUI_fast_cut.gif)
 
 ### Performing an animated cut with the GUI
-![Performing an animated cut with the GUI](report-gifs/GUI_animate_cut.gif)
+![Performing an animated cut with the GUI](docs/animations/GUI_animate_cut.gif)
