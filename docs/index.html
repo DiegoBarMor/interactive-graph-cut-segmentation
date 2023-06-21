@@ -62,7 +62,7 @@
             </p>
 
             <figure>
-              <img src="report-figures/n_edges.png", alt="Non-terminal edges">
+              <img src="figures/n_edges.png", alt="Non-terminal edges">
               <figcaption class="text-center"> Example of a 5x5 image (left) and its graph representation (right). Each node stores the original $Ip$ information and is connected to its neighbours by non-terminal edges. </figcaption>
             </figure>
 
@@ -77,7 +77,7 @@
             </p>
 
             <figure>
-              <img src="report-figures/n_t_edges.png", alt="Non-terminal and terminal edges">
+              <img src="figures/n_t_edges.png", alt="Non-terminal and terminal edges">
               <figcaption class="text-center"> Example of a 5x5 image (left) and its graph representation (right). The graph is expanded by adding the terminal nodes $S$ and $T$, as well as the edges connecting them to all the nodes from $P$. </figcaption>
             </figure>
 
@@ -98,7 +98,7 @@
             </p>
 
             <figure>
-              <img src="report-figures/cut.png", alt="Graph cut">
+              <img src="figures/cut.png", alt="Graph cut">
               <figcaption class="text-center"> Example of a 5x5 image (left) and its graph representation (right). The subset of edges $C$ is removed from the graph, removing all possible paths from $S$ to $T$. </figcaption>
             </figure>
 
@@ -112,8 +112,8 @@
             </p>
 
             <ul>
-              <li><b>Flow</b> ($flow \ge 0$): The amount of water currently pushed through an edge. This value remains constant.</li>
-              <li><b>Capacity</b> ($cap \ge 0$): How much water is supported by an edge.</li>
+              <li><b>Flow</b> ($flow \ge 0$): The amount of water currently pushed through an edge.</li>
+              <li><b>Capacity</b> ($cap \ge 0$): How much water is supported by an edge. This value remains constant.</li>
               <li><b>Residual</b> capacity ($res \ge 0$): The capacity left after pushing a certain amount of flow through the edge, given by $res = cap - flow$.</li>
             </ul>
 
@@ -262,7 +262,7 @@
             </p>
 
             <figure>
-              <img class="fig2" src="report-figures/bk_schema.png", alt="Schema for the BK algorithm">
+              <img class="fig2" src="figures/bk_schema.png", alt="Schema for the BK algorithm">
             </figure>
 
             <p>
@@ -284,7 +284,7 @@
             </p>
 
             <figure>
-              <img class="fig_small" src="report-figures/borders.png", alt="Description of Borders()">
+              <img class="fig_small" src="figures/borders.png", alt="Description of Borders()">
               <figcaption class="text-center">Description of the $Borders$ function. This is a small addition to the original BK algorithm that optimizes the first iteration when large seeds are given.</figcaption>
             </figure>
 
@@ -294,7 +294,7 @@
             </p>
 
             <figure>
-              <img class="fig2" src="report-figures/stage_grow.png", alt="Pseudocode for the growth stage">
+              <img class="fig2" src="figures/stage_grow.png", alt="Pseudocode for the growth stage">
               <figcaption class="text-center">Pseudocode for the growth stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
             </figure>
 
@@ -304,7 +304,7 @@
             </p>
 
             <figure>
-              <img class="fig2" src="report-figures/stage_augment.png", alt="Pseudocode for the augmentation stage">
+              <img class="fig2" src="figures/stage_augment.png", alt="Pseudocode for the augmentation stage">
               <figcaption class="text-center">Pseudocode for the augmentation stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
             </figure>
 
@@ -314,7 +314,7 @@
             </p>
 
             <figure>
-              <img class="fig2" src="report-figures/stage_adopt.png", alt="Pseudocode for the adoption stage">
+              <img class="fig2" src="figures/stage_adopt.png", alt="Pseudocode for the adoption stage">
               <figcaption class="text-center">Pseudocode for the adoption stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
             </figure>
 
@@ -341,7 +341,7 @@
             </p>
 
             <figure>
-              <img src="report-figures/gui_main.png", alt="Main window of the GUI">
+              <img src="figures/gui_main.png", alt="Main window of the GUI">
               <figcaption class="text-center">Main window of the GUI.</figcaption>
             </figure>
 
@@ -358,7 +358,7 @@
             </p>
 
             <figure>
-              <img src="report-gifs/GUI_seeds.gif", alt="Basic usage of the GUI">
+              <img src="animations/GUI_seeds.gif", alt="Basic usage of the GUI">
               <figcaption class="text-center">Basic usage of the GUI.</figcaption>
             </figure>
 
@@ -372,7 +372,7 @@
             </p>
 
             <figure>
-              <img src="report-gifs/GUI_fast_cut.gif", alt="Performing a fast cut with the GUI">
+              <img src="animations/GUI_fast_cut.gif", alt="Performing a fast cut with the GUI">
               <figcaption class="text-center">Performing a fast cut with the GUI. The final search trees are displayed as a semitransparent red for $S_t$ and semitransparent blue for $T_t$. </figcaption>
             </figure>
 
@@ -385,7 +385,7 @@
             </p>
 
             <figure>
-              <img src="report-gifs/GUI_animate_cut.gif", alt="Performing an animated cut with the GUI">
+              <img src="animations/GUI_animate_cut.gif", alt="Performing an animated cut with the GUI">
               <figcaption class="text-center">Performing an animated cut with the GUI. The incomplete search trees follow the same color schema, while pixels crossed by $path_{ST}$ are displayed in green.</figcaption>
             </figure>
 
@@ -400,8 +400,8 @@
 
             <figure>
               <div class="d-flex flex-row fig_hscroll">
-                <img class="col px-2" src="report-gifs/GUI_cut_bfs.gif", alt="Animation of a BFS cut">
-                <img class="col px-2" src="report-gifs/GUI_cut_rnd.gif", alt="Animation of a RND cut">
+                <img class="col px-2" src="animations/GUI_cut_bfs.gif", alt="Animation of a BFS cut">
+                <img class="col px-2" src="animations/GUI_cut_rnd.gif", alt="Animation of a RND cut">
               </div>
               <div class="row">
                 <figcaption class="text-center">Comparison of the growth phase between a BFS based cut (left) and a RND based cut (right).</figcaption>
@@ -414,8 +414,8 @@
 
             <figure>
               <div class="d-flex flex-row fig_hscroll">
-                <img class="col px-2" src="report-figures/gui_cut_bfs.png", alt="Paths found by a BFS cut">
-                <img class="col px-2" src="report-figures/gui_cut_rnd.png", alt="Paths found by a RND cut">
+                <img class="col px-2" src="figures/gui_cut_bfs.png", alt="Paths found by a BFS cut">
+                <img class="col px-2" src="figures/gui_cut_rnd.png", alt="Paths found by a RND cut">
               </div>
               <div class="row">
                 <figcaption class="text-center">Comparison of the paths $path_{ST}$ found by a BFS based cut (left) and a RND based cut (right). BFS required 1769 cut cycles while RND required 1794 cycles.</figcaption>
@@ -429,7 +429,7 @@
 
             <figure>
               <div class="d-flex flex-row fig_hscroll">
-                <img class="col px-2 fig2" src="report-figures/penalties_Rp.png", alt="Rp penalties">
+                <img class="col px-2 fig2" src="figures/penalties_Rp.png", alt="Rp penalties">
               </div>
               <div class="row">
                 <figcaption class="text-center">Representation of the penalty values for edges connecting to the source ("Rp bck") and to the sink ("Rp obj"). Darker values represent higher edge costs.</figcaption>
@@ -447,8 +447,8 @@
 
             <figure >
               <div class="d-flex flex-row fig_hscroll">
-                <img class="col px-2 img3 fig2alt" src="report-figures/penalties_Bp_before.png", alt="Bp penalties (before)">
-                <img class="col px-2 img3 fig2alt" src="report-figures/penalties_Bp_after.png", alt="Bp penalties (after)">
+                <img class="col px-2 img3 fig2alt" src="figures/penalties_Bp_before.png", alt="Bp penalties (before)">
+                <img class="col px-2 img3 fig2alt" src="figures/penalties_Bp_after.png", alt="Bp penalties (after)">
               </div>
               <div class="row">
                 <figcaption class="text-center">Representation of the penalty values for edges connecting neighbours on the four different directions. Values before (2x2 grid left) and after (2x2 grid right) the cut can be compared. Darker values represent higher edge costs. <small>(Scroll horizontally to see full figure, if incomplete. Figure consists of 8 subplots)</small></figcaption>
@@ -467,9 +467,9 @@
 
             <figure>
               <div class="d-flex flex-row fig_hscroll">
-                <img class="col px-2 img3" src="test-images/pup.png" alt="Example image: Simple illustration">
-                <img class="col px-2 img3" src="test-images/bird.png" alt="Example image: More detailed illustration">
-                <img class="col px-2 img3" src="test-images/fluff.png" alt="Example image: Photography">
+                <img class="col px-2 img3" src="figures/pup.png" alt="Example image: Simple illustration">
+                <img class="col px-2 img3" src="figures/bird.png" alt="Example image: More detailed illustration">
+                <img class="col px-2 img3" src="figures/fluff.png" alt="Example image: Photography">
               </div>
               <div class="row">
                 <figcaption class="text-center">Test images presented as examples for the segmentation, with different levels of complexity: left) a simple 304x304 illustration <a href="#ref6">[6]</a>, middle) a more detailed 414x354 illustration <a href="#ref7">[7]</a>, right) a 362x262 photography.</figcaption>
@@ -478,9 +478,9 @@
 
             <figure>
             <div class="d-flex flex-row fig_hscroll">
-              <img class="col px-2 img3" src="report-figures/pup_seeds.png" alt="Seeded image: Simple illustration">
-              <img class="col px-2 img3" src="report-figures/bird_seeds.png" alt="Seeded image: More detailed illustration">
-              <img class="col px-2 img3" src="report-figures/fluff_seeds.png" alt="Seeded image: Photography">
+              <img class="col px-2 img3" src="figures/pup_seeds.png" alt="Seeded image: Simple illustration">
+              <img class="col px-2 img3" src="figures/bird_seeds.png" alt="Seeded image: More detailed illustration">
+              <img class="col px-2 img3" src="figures/fluff_seeds.png" alt="Seeded image: Photography">
             </div>
             <div class="row">
               <figcaption class="text-center">Sets of seeds used for each image.</figcaption>
@@ -489,8 +489,8 @@
 
             <figure>
             <div class="d-flex flex-row fig_hscroll">
-              <img class="col px-2 img3" src="report-figures/pup-OBJ.png", alt="Result of the segmentation (object)">
-              <img class="col px-2 img3" src="report-figures/pup-BKG.png", alt="Result of the segmentation (background)">
+              <img class="col px-2 img3" src="figures/pup-OBJ.png", alt="Result of the segmentation (object)">
+              <img class="col px-2 img3" src="figures/pup-BKG.png", alt="Result of the segmentation (background)">
             </div>
             <div class="row">
               <figcaption class="text-center">Result of the segmentation ($\sigma = 0.01, \lambda = 0.2$): left) object, right) background.</figcaption>
@@ -499,9 +499,9 @@
 
             <figure>
             <div class="d-flex flex-row fig_hscroll">
-              <img class="col px-2 img3" src="report-figures/bird-S0.1.png", alt="Result of the segmentation (sigma = 0.1)">
-              <img class="col px-2 img3" src="report-figures/bird-S0.01.png", alt="Result of the segmentation (sigma = 0.01)">
-              <img class="col px-2 img3" src="report-figures/bird-S0.001.png", alt="Result of the segmentation (sigma = 0.001)">
+              <img class="col px-2 img3" src="figures/bird-S0.1.png", alt="Result of the segmentation (sigma = 0.1)">
+              <img class="col px-2 img3" src="figures/bird-S0.01.png", alt="Result of the segmentation (sigma = 0.01)">
+              <img class="col px-2 img3" src="figures/bird-S0.001.png", alt="Result of the segmentation (sigma = 0.001)">
             </div>
             <div class="row">
               <figcaption class="text-center">Result of the segmentation under different parameter values (constant $\lambda = 0.2$): left) $\sigma = 0.1$, middle) $\sigma = 0.01$, right) $\sigma = 0.001$.</figcaption>
@@ -510,9 +510,9 @@
 
             <figure>
             <div class="d-flex flex-row fig_hscroll">
-              <img class="col px-2 img3" src="report-figures/fluff-S0.5.png", alt="Result of the segmentation (sigma = 0.5)">
-              <img class="col px-2 img3" src="report-figures/fluff-S0.1.png", alt="Result of the segmentation (sigma = 0.1)">
-              <img class="col px-2 img3" src="report-figures/fluff-S0.001.png", alt="Result of the segmentation (sigma = 0.001)">
+              <img class="col px-2 img3" src="figures/fluff-S0.5.png", alt="Result of the segmentation (sigma = 0.5)">
+              <img class="col px-2 img3" src="figures/fluff-S0.1.png", alt="Result of the segmentation (sigma = 0.1)">
+              <img class="col px-2 img3" src="figures/fluff-S0.001.png", alt="Result of the segmentation (sigma = 0.001)">
             </div>
             <div class="row">
               <figcaption class="text-center">Result of the segmentation under different parameter values (constant $\lambda = 0.2$): left) $\sigma = 0.5$, middle) $\sigma = 0.1$, right) $\sigma = 0.001$.</figcaption>
