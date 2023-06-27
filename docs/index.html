@@ -28,7 +28,7 @@
       <div class="contents">
         <h1>Interactive Graph Cut Image Segmentation</h1>
           <small>Project report for the course <i>Signal, Image and Video</i>, University of Trento</small> <br>
-          <small>By <a href="https://github.com/DiegoBarqueroMorera/">Diego Barquero Morera</a></small>
+          <small>By <a href="https://github.com/DiegoBarMor/">Diego Barquero Morera</a></small>
 
 
         <h2 id="introduction">Introduction</h2>
@@ -37,7 +37,7 @@
           </p>
 
           <p>
-            For this project, the method described in <a href="#ref1">[1]</a> and <a href="#ref2">[2]</a> was implemented in Python (available <a href="https://github.com/DiegoBarqueroMorera/interactive-graph-cut-segmentation" target="_blank">here</a>). The goal of this method is to segment a 2D image into two parts (binary segmentation): <b>object</b> and <b>background</b>. A user provides a set of pixels that are certain to be part of the object, and another set of pixels certain to be part of the background. Both sets are denominated <b>seeds</b> for object and background respectively.
+            For this project, the method described in <a href="#ref1">[1]</a> and <a href="#ref2">[2]</a> was implemented in Python (available <a href="https://github.com/DiegoBarMor/interactive-graph-cut-segmentation" target="_blank">here</a>). The goal of this method is to segment a 2D image into two parts (binary segmentation): <b>object</b> and <b>background</b>. A user provides a set of pixels that are certain to be part of the object, and another set of pixels certain to be part of the background. Both sets are denominated <b>seeds</b> for object and background respectively.
           </p>
 
           <p>
@@ -73,7 +73,7 @@
               Furthermore, additional edges connect each node from $P$ to both $S$ and $T$, such that
               $$E_t = \bigcup_{p \in P} \{(S,p), (p,T)\} \\ E = E_n \cup E_t$$
 
-              Note that if directed edges are been employed, the order of the edges from $E_t$ matter.
+              Note that if directed edges are been employed, the order of the edges from $E_t$ matters.
             </p>
 
             <figure>
@@ -333,7 +333,7 @@
 
           <h3>Basic Usage</h3>
             <p>
-              The source code of this implementation is available to download <a href="https://github.com/DiegoBarqueroMorera/interactive-graph-cut-segmentation">here</a>. Downloading <code>src/</code> is sufficient to execute the implementation, while additional test images can be downloaded from <code>samples/</code>. The source code of this report is also available on the same repository.
+              The source code of this implementation is available to download <a href="https://github.com/DiegoBarMor/interactive-graph-cut-segmentation">here</a>. Downloading <code>src/</code> is sufficient to execute the implementation, while additional test images can be downloaded from <code>samples/</code>. The source code of this report is also available in <code>docs/</code>.
             </p>
 
             <p>
