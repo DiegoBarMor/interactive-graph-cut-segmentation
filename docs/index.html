@@ -1,551 +1,565 @@
 <!DOCTYPE html>
-  <html>
-    <head>
-      <title>Interactive Graph Cut Image Segmentation</title>
+<html>
+  <head>
+    <title>Interactive Graph Cut Image Segmentation</title>
+    <link rel="stylesheet" href="https://raw.githack.com/DiegoBarMor/chocomint-css/main/chocomint.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script type = "text/x-mathjax-config">
+      MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript" async
+      src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+  </head>
 
-      <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
-      <link rel="stylesheet" href="https://raw.githack.com/DiegoBarMor/DiegoBarMor.github.io/refs/heads/main/docs/prisma.css">
-      <link rel="stylesheet" type="text/css" href=style.css>
-
-      <script type = "text/x-mathjax-config">
-        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
-      </script>
-      <script type="text/javascript" async
-        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
-      </script>
-    </head>
-
-    <body>
-      <nav>
-        <div class="nav-container">
-          <a href="https://diegobarmor.github.io/">
-            <img class="nav-icon" src="https://diegobarmor.github.io/icons/home.png" alt="Icon">
-          </a>
-          <div class="nav-buttons">
-            <a class="button" href="#introduction">Introduction</a>
-            <a class="button" href="#theory">Theoretical Background</a>
-            <a class="button" href="#graph">Graph Preparation</a>
-            <a class="button" href="#algorithm">Boykov-Kolmogorov Algorithm</a>
-            <a class="button" href="#implementation">Python Implementation</a>
-            <a class="button" href="#references">References</a>
-          </div>
+  <body>
+    <header class="dynamic-navbar" id="navbar">
+      <nav class="chocomint-nav-container">
+        <abbr title="Home DiegoBarMor"><a href="https://diegobarmor.github.io/">
+            <img class="icon-neon" src="https://raw.githack.com/DiegoBarMor/chocomint-css/main/icons/home.png" alt="Icon">
+          </a></abbr>
+        <abbr title="Toggle BG Particles">
+          <img class="icon-neon" src="https://raw.githack.com/DiegoBarMor/chocomint-css/main/icons/particles.png" alt="Icon" onclick="toggle_particles()">
+        </abbr>
+        <abbr title="Toggle Theme">
+          <img class="icon-neon" src="https://raw.githack.com/DiegoBarMor/chocomint-css/main/icons/theme.png" alt="Icon" onclick="toggle_theme()">
+        </abbr>
+        <div class="chocomint-nav-buttons">
+          <select id="page-select">
+            <optgroup label="Section">
+              <option value="introduction">Introduction</option>
+              <option value="theory">Theoretical Background</option>
+              <option value="graph">Graph Preparation</option>
+              <option value="algorithm">Boykov-Kolmogorov Algorithm</option>
+              <option value="implementation">Python Implementation</option>
+              <option value="references">References</option>
+            </optgroup>
+          </select>
         </div>
       </nav>
+    </header>
 
-      <div class="contents">
-        <h1>Interactive Graph Cut Image Segmentation</h1>
-          <small>Project report for the course <i>Signal, Image and Video</i>, University of Trento</small> <br>
-          <small>By <a href="https://github.com/DiegoBarMor/">Diego Barquero Morera</a></small>
+    <main id="main">
+      <h1>Interactive Graph Cut Image Segmentation</h1>
+        <small>Project report for the course <i>Signal, Image and Video</i>, University of Trento</small> <br>
+        <small>By <a href="https://github.com/DiegoBarMor/">Diego Barquero Morera</a></small>
 
 
-        <h2 id="introduction">Introduction</h2>
+      <h2 id="introduction">Introduction</h2>
+        <p>
+          Interactive image segmentation techniques are a promising alternative to fully automatic segmentation. They take a small human input as ground truth and then expand it via an algorithm to segment the image with (hopefully) more realistic and useful results.
+        </p>
+
+        <p>
+          For this project, the method described in <a href="#ref1">[1]</a> and <a href="#ref2">[2]</a> was implemented in Python (available <a href="https://github.com/DiegoBarMor/interactive-graph-cut-segmentation" target="_blank">here</a>). The goal of this method is to segment a 2D image into two parts (binary segmentation): <b>object</b> and <b>background</b>. A user provides a set of pixels that are certain to be part of the object, and another set of pixels certain to be part of the background. Both sets are denominated <b>seeds</b> for object and background respectively.
+        </p>
+
+        <p>
+          Taking into account both sets of seeds, the image is first represented as a directed graph. Then, the image is segmented by finding the optimal <i>cut</i> of the edges of the graph, by exploiting the <i>max-flow min-cut</i> theorem. In the next sections, a brief introduction of these concepts is presented, as well as the details of the algorithm and the Python implementation.
+        </p>
+
+
+      <h2 id="theory">Theoretical Background</h2>
+        <h3>Graphs</h3>
           <p>
-            Interactive image segmentation techniques are a promising alternative to fully automatic segmentation. They take a small human input as ground truth and then expand it via an algorithm to segment the image with (hopefully) more realistic and useful results.
+            A <b>graph</b> $G = \langle V, E \rangle$ is defined as a set of <b>nodes</b> $V$ and a set of <b>edges</b> $E$. Each edge $e \in E$ connects a pair of nodes $p, q \in V$, and is represented as $e = (p, q)$. A graph is <b>undirected</b> if
+            $$e = (p, q) = (q, p) \quad \forall e \in E; p, q \in V$$
+
+            and <b>directed</b> if
+            $$e = (p, q) \neq (q, p)$$
+
+            Finally, in a <b>weighted</b> (or capacitated) graph, each edge $e \in E$ is assigned a weight (or <b>cost</b>) $w_e \in \mathbb{R}$.
           </p>
 
           <p>
-            For this project, the method described in <a href="#ref1">[1]</a> and <a href="#ref2">[2]</a> was implemented in Python (available <a href="https://github.com/DiegoBarMor/interactive-graph-cut-segmentation" target="_blank">here</a>). The goal of this method is to segment a 2D image into two parts (binary segmentation): <b>object</b> and <b>background</b>. A user provides a set of pixels that are certain to be part of the object, and another set of pixels certain to be part of the background. Both sets are denominated <b>seeds</b> for object and background respectively.
+            An image can be represented as a graph by taking the intensity $Ip$ of each pixel $p$ and assigning it to a node in the subset $P \subset V$. The position information of the pixels is conserved by defining a subset of edges $E_n \subset E$ such that any pair of nodes $p, q \in V$ corresponding to neighbouring pixels in the image is connected by an edge $e_n = (p, q) \in E_n$. Depending on the application, the graph may be defined as undirected or directed; in the latter case, another edge is defined for each pair of pixels $e_n' = (q, p)$. The edges from $E_n$ are known as neighbouring or <b>non-terminal</b> edges. For this implementation, 4-connected pixels are considered as neighbours, although some adjustments can be done for using other criteria.
           </p>
 
+          <figure>
+            <img src="figures/n_edges.png", alt="Non-terminal edges">
+            <figcaption class="text-center"> Example of a 5x5 image (left) and its graph representation (right). Each node stores the original $Ip$ information and is connected to its neighbours by non-terminal edges. </figcaption>
+          </figure>
+
           <p>
-            Taking into account both sets of seeds, the image is first represented as a directed graph. Then, the image is segmented by finding the optimal <i>cut</i> of the edges of the graph, by exploiting the <i>max-flow min-cut</i> theorem. In the next sections, a brief introduction of these concepts is presented, as well as the details of the algorithm and the Python implementation.
+            For this segmentation method, two special nodes are added: an "object" terminal called <b>source</b> ($S$) and a "background" terminal called <b>sink</b> ($T$). This means that
+            $$V = P \cup \{S, T\}$$
+
+            Furthermore, additional edges connect each node from $P$ to both $S$ and $T$, such that
+            $$E_t = \bigcup_{p \in P} \{(S,p), (p,T)\} \\ E = E_n \cup E_t$$
+
+            Note that if directed edges are been employed, the order of the edges from $E_t$ matters.
           </p>
 
+          <figure>
+            <img src="figures/n_t_edges.png", alt="Non-terminal and terminal edges">
+            <figcaption class="text-center"> Example of a 5x5 image (left) and its graph representation (right). The graph is expanded by adding the terminal nodes $S$ and $T$, as well as the edges connecting them to all the nodes from $P$. </figcaption>
+          </figure>
 
-        <h2 id="theory">Theoretical Background</h2>
-          <h3>Graphs</h3>
-            <p>
-              A <b>graph</b> $G = \langle V, E \rangle$ is defined as a set of <b>nodes</b> $V$ and a set of <b>edges</b> $E$. Each edge $e \in E$ connects a pair of nodes $p, q \in V$, and is represented as $e = (p, q)$. A graph is <b>undirected</b> if
-              $$e = (p, q) = (q, p) \quad \forall e \in E; p, q \in V$$
-
-              and <b>directed</b> if
-              $$e = (p, q) \neq (q, p)$$
-
-              Finally, in a <b>weighted</b> (or capacitated) graph, each edge $e \in E$ is assigned a weight (or <b>cost</b>) $w_e \in \mathbb{R}$.
-            </p>
-
-            <p>
-              An image can be represented as a graph by taking the intensity $Ip$ of each pixel $p$ and assigning it to a node in the subset $P \subset V$. The position information of the pixels is conserved by defining a subset of edges $E_n \subset E$ such that any pair of nodes $p, q \in V$ corresponding to neighbouring pixels in the image is connected by an edge $e_n = (p, q) \in E_n$. Depending on the application, the graph may be defined as undirected or directed; in the latter case, another edge is defined for each pair of pixels $e_n' = (q, p)$. The edges from $E_n$ are known as neighbouring or <b>non-terminal</b> edges. For this implementation, 4-connected pixels are considered as neighbours, although some adjustments can be done for using other criteria.
-            </p>
-
-            <figure>
-              <img src="figures/n_edges.png", alt="Non-terminal edges">
-              <figcaption class="text-center"> Example of a 5x5 image (left) and its graph representation (right). Each node stores the original $Ip$ information and is connected to its neighbours by non-terminal edges. </figcaption>
-            </figure>
-
-            <p>
-              For this segmentation method, two special nodes are added: an "object" terminal called <b>source</b> ($S$) and a "background" terminal called <b>sink</b> ($T$). This means that
-              $$V = P \cup \{S, T\}$$
-
-              Furthermore, additional edges connect each node from $P$ to both $S$ and $T$, such that
-              $$E_t = \bigcup_{p \in P} \{(S,p), (p,T)\} \\ E = E_n \cup E_t$$
-
-              Note that if directed edges are been employed, the order of the edges from $E_t$ matters.
-            </p>
-
-            <figure>
-              <img src="figures/n_t_edges.png", alt="Non-terminal and terminal edges">
-              <figcaption class="text-center"> Example of a 5x5 image (left) and its graph representation (right). The graph is expanded by adding the terminal nodes $S$ and $T$, as well as the edges connecting them to all the nodes from $P$. </figcaption>
-            </figure>
-
-          <h3>Graph Cuts</h3>
-            <p>
-              Given a set of nodes $A = \{a_1, \dots, a_n\}$, a <b>path</b> is a sequence of edges that allows to traverse from $a_1$ to $a_n$. A path that starts in the source and finishes at the sink will be denominated here as $path_{St}$. A generic path can be defined as
-              $$Path = \bigcup_i^{n-1} \{a_i, a_{i+1}\}$$
-
-              A <b>cut</b> is a subset of edges $C \subset E$ such that in the graph $G' = \langle V, E \backslash C \rangle$ there is no path between the terminal nodes $S$ and $T$. Alternatively, it can be seen as the graph being separated into two sub-graphs, where all the nodes from a given subgraph are only connected to the same terminal node
-              $$
-                G' = G_S \cup G_T \\
-                G_S = \langle V_S, E_n' \bigcup_{p \in P_S} \{(S,p)\} \rangle \\
-                G_T = \langle V_T, E_n'' \bigcup_{p \in P_T} \{(p,T)\} \rangle
-              $$
-
-              Finally, the <b>cost</b> of the cut is defined as the sum of the weights of the edges it comprises
-              $$|C| = \sum_{e \in C} w_e$$
-            </p>
-
-            <figure>
-              <img src="figures/cut.png", alt="Graph cut">
-              <figcaption class="text-center"> Example of a 5x5 image (left) and its graph representation (right). The subset of edges $C$ is removed from the graph, removing all possible paths from $S$ to $T$. </figcaption>
-            </figure>
-
-          <h3>Graph Flow</h3>
-            <p>
-              A weighted graph can be interpreted as a network of "pipes" described by its edges, where water can be imagined to flow in a given direction. For the specific graphs described before, the flow starts at the source node $S$, goes through the image nodes $P$ and end up in the sink node $T$ (hence the terminology used for the terminal nodes).
-            </p>
-
-            <p>
-              The weights of the edges can represent different concepts under this interpretation, depending on what is required:
-            </p>
-
-            <ul>
-              <li><b>Flow</b> ($flow \ge 0$): The amount of water currently pushed through an edge.</li>
-              <li><b>Capacity</b> ($cap \ge 0$): How much water is supported by an edge. This value remains constant.</li>
-              <li><b>Residual</b> capacity ($res \ge 0$): The capacity left after pushing a certain amount of flow through the edge, given by $res = cap - flow$.</li>
-            </ul>
-
-            <p>
-              Note the at any given moment the flow going through an edge can't exceed its capacity, so  $flow \le cap \implies res \ge 0$. In the specific case when $flow = cap \implies res = 0$, it is said that the edge is <b>saturated</b>, meaning that it is moving the maximum amount of water it can handle. Similarly, a <b>saturated path</b> is a path where one or more edges are saturated. For the purposes of this method, all edges composing a cut must be saturated.
-            </p>
-
-          <h3>Optimal Cut</h3>
-            <p>
-              The idea of defining all of these concepts is to find a way to quantitatively measure a given image segmentation. Such measure is to be optimized via an automatic algorithm, in order to choose the best image segmentation from the space of all possible segmentations.
-            </p>
-
-            <p>
-              Intuitively, a graph cut can be interpreted as the segmentation of the image represented by the graph. An optimal segmentation would be a cut $C$ such that the nodes from the subgraphs obtained, $N_S$ and $N_T$, correspond to pixels that most likely belong to the object and background respectively. This <b>optimal cut</b> corresponds to the cut with the lowest cost $|C|$ and is often obtained by minimizing an energy function of the general form
-              $$E(L) = \sum_{p \in P}Rp(Lp) + \sum_{(p,q) \in E_n}Bp(p, q)$$
-
-              where $L = \{L_p \in \{obj, bkg\} | p \in P\}$ is the binary labelling of the image, $Rp$ is a regional penalty function and $Bp$ a boundary penalty function.
-            </p>
-
-            <p>
-              As the names suggest, $Rp$ penalizes pixels according to the region they are associated with. Here, "region" refers to either the object or the background, so the penalty works by checking how probable is the pixel part of the object or background, given a prior intensity distribution obtained from the data. This prior is built from the seeds provided by the user. On the other hand, $Bp$ penalizes pixels according to their local interaction with neighbouring pixels, by comparing their $Ip$ values with some sort of metric.
-            </p>
-
-            <p>
-              For minimizing the energy and thus obtain the optimal cut, the <b>max-flow min-cut</b> theorem can be exploited. This theorem states that the maximum flow from $S$ to $T$ saturates a set of edges $C^*$ that correspond to the minimum cut, leaving behind two disjoint subgraphs $G_S$ and $G_T$. The objective of many graph based segmentation methods is to take advantage on this duality property and find the maximum flow of the system, which guarantees the minimum cut and therefore the optimal segmentation given the inputs.
-            </p>
-
-
-        <h2 id="graph">Graph Preparation</h2>
+        <h3>Graph Cuts</h3>
           <p>
-            After mapping the pixels of the image into the nodes and edges of a graph, assigning weights to the edges requires energy functions to be defined. For this implementation, the energy functions were inspired by <a href="#ref1">[1]</a>. Consider $Obj \in P$ the subset of pixels marked as a seed for object and $Bkg \in P$ the pixels marked as a seed for background. Then, the energy functions consist of
+            Given a set of nodes $A = \{a_1, \dots, a_n\}$, a <b>path</b> is a sequence of edges that allows to traverse from $a_1$ to $a_n$. A path that starts in the source and finishes at the sink will be denominated here as $path_{St}$. A generic path can be defined as
+            $$Path = \bigcup_i^{n-1} \{a_i, a_{i+1}\}$$
+
+            A <b>cut</b> is a subset of edges $C \subset E$ such that in the graph $G' = \langle V, E \backslash C \rangle$ there is no path between the terminal nodes $S$ and $T$. Alternatively, it can be seen as the graph being separated into two sub-graphs, where all the nodes from a given subgraph are only connected to the same terminal node
             $$
-              Bp(p, q) = \exp(-\frac{(Ip - Iq)^2}{2 \sigma^2})\\
-              Rp_{obj}(p) = -\ln(\Pr(Ip | Obj)) \\
-              Rp_{bkg}(p) = -\ln(\Pr(Ip | Bkg))
+              G' = G_S \cup G_T \\
+              G_S = \langle V_S, E_n' \bigcup_{p \in P_S} \{(S,p)\} \rangle \\
+              G_T = \langle V_T, E_n'' \bigcup_{p \in P_T} \{(p,T)\} \rangle
             $$
 
-            In this implementation, the image is processed as black and white, so $Ip$ is a single value varying from 0 to 1 (the intensities must be normalized for $Bp$ to work correctly). Furthermore, the probability of the intensity given a seed is described by the histogram of intensities for pixels in the given seed. Other approaches could also be considered, such as using the seeds to estimate the parameters of a Gaussian distribution. Additionaly, a constant $K$ is also defined as
-            $$K = 1 + \max_{p \in P} \sum_{q : (p,q) \in E_n} Bp(p,q)$$
+            Finally, the <b>cost</b> of the cut is defined as the sum of the weights of the edges it comprises
+            $$|C| = \sum_{e \in C} w_e$$
+          </p>
 
-            The edges can then be assigned weights according to the following table (note that both $\sigma$ and $\lambda$ are parameters that need to be set by the user):
+          <figure>
+            <img src="figures/cut.png", alt="Graph cut">
+            <figcaption class="text-center"> Example of a 5x5 image (left) and its graph representation (right). The subset of edges $C$ is removed from the graph, removing all possible paths from $S$ to $T$. </figcaption>
+          </figure>
+
+        <h3>Graph Flow</h3>
+          <p>
+            A weighted graph can be interpreted as a network of "pipes" described by its edges, where water can be imagined to flow in a given direction. For the specific graphs described before, the flow starts at the source node $S$, goes through the image nodes $P$ and end up in the sink node $T$ (hence the terminology used for the terminal nodes).
+          </p>
+
+          <p>
+            The weights of the edges can represent different concepts under this interpretation, depending on what is required:
+          </p>
+
+          <ul>
+            <li><b>Flow</b> ($flow \ge 0$): The amount of water currently pushed through an edge.</li>
+            <li><b>Capacity</b> ($cap \ge 0$): How much water is supported by an edge. This value remains constant.</li>
+            <li><b>Residual</b> capacity ($res \ge 0$): The capacity left after pushing a certain amount of flow through the edge, given by $res = cap - flow$.</li>
+          </ul>
+
+          <p>
+            Note the at any given moment the flow going through an edge can't exceed its capacity, so  $flow \le cap \implies res \ge 0$. In the specific case when $flow = cap \implies res = 0$, it is said that the edge is <b>saturated</b>, meaning that it is moving the maximum amount of water it can handle. Similarly, a <b>saturated path</b> is a path where one or more edges are saturated. For the purposes of this method, all edges composing a cut must be saturated.
+          </p>
+
+        <h3>Optimal Cut</h3>
+          <p>
+            The idea of defining all of these concepts is to find a way to quantitatively measure a given image segmentation. Such measure is to be optimized via an automatic algorithm, in order to choose the best image segmentation from the space of all possible segmentations.
+          </p>
+
+          <p>
+            Intuitively, a graph cut can be interpreted as the segmentation of the image represented by the graph. An optimal segmentation would be a cut $C$ such that the nodes from the subgraphs obtained, $N_S$ and $N_T$, correspond to pixels that most likely belong to the object and background respectively. This <b>optimal cut</b> corresponds to the cut with the lowest cost $|C|$ and is often obtained by minimizing an energy function of the general form
+            $$E(L) = \sum_{p \in P}Rp(Lp) + \sum_{(p,q) \in E_n}Bp(p, q)$$
+
+            where $L = \{L_p \in \{obj, bkg\} | p \in P\}$ is the binary labelling of the image, $Rp$ is a regional penalty function and $Bp$ a boundary penalty function.
+          </p>
+
+          <p>
+            As the names suggest, $Rp$ penalizes pixels according to the region they are associated with. Here, "region" refers to either the object or the background, so the penalty works by checking how probable is the pixel part of the object or background, given a prior intensity distribution obtained from the data. This prior is built from the seeds provided by the user. On the other hand, $Bp$ penalizes pixels according to their local interaction with neighbouring pixels, by comparing their $Ip$ values with some sort of metric.
+          </p>
+
+          <p>
+            For minimizing the energy and thus obtain the optimal cut, the <b>max-flow min-cut</b> theorem can be exploited. This theorem states that the maximum flow from $S$ to $T$ saturates a set of edges $C^*$ that correspond to the minimum cut, leaving behind two disjoint subgraphs $G_S$ and $G_T$. The objective of many graph based segmentation methods is to take advantage on this duality property and find the maximum flow of the system, which guarantees the minimum cut and therefore the optimal segmentation given the inputs.
+          </p>
+
+
+      <h2 id="graph">Graph Preparation</h2>
+        <p>
+          After mapping the pixels of the image into the nodes and edges of a graph, assigning weights to the edges requires energy functions to be defined. For this implementation, the energy functions were inspired by <a href="#ref1">[1]</a>. Consider $Obj \in P$ the subset of pixels marked as a seed for object and $Bkg \in P$ the pixels marked as a seed for background. Then, the energy functions consist of
+          $$
+            Bp(p, q) = \exp(-\frac{(Ip - Iq)^2}{2 \sigma^2})\\
+            Rp_{obj}(p) = -\ln(\Pr(Ip | Obj)) \\
+            Rp_{bkg}(p) = -\ln(\Pr(Ip | Bkg))
+          $$
+
+          In this implementation, the image is processed as black and white, so $Ip$ is a single value varying from 0 to 1 (the intensities must be normalized for $Bp$ to work correctly). Furthermore, the probability of the intensity given a seed is described by the histogram of intensities for pixels in the given seed. Other approaches could also be considered, such as using the seeds to estimate the parameters of a Gaussian distribution. Additionaly, a constant $K$ is also defined as
+          $$K = 1 + \max_{p \in P} \sum_{q : (p,q) \in E_n} Bp(p,q)$$
+
+          The edges can then be assigned weights according to the following table (note that both $\sigma$ and $\lambda$ are parameters that need to be set by the user):
+        </p>
+
+        <table class="tg">
+        <thead>
+          <tr>
+            <th class="tg-nrix">edge type</th>
+            <th class="tg-nrix">weight (cost)</th>
+            <th class="tg-nrix">condition</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="tg-nrix">$(p,q)$</td>
+            <td class="tg-nrix">$Bp(p,q)$</td>
+            <td class="tg-nrix">$(p,q) \in E_n$</td>
+          </tr>
+          <tr>
+            <td class="tg-nrix" rowspan="3">$(S,p)$</td>
+            <td class="tg-nrix">$\lambda Rp_{bkg}(p)$</td>
+            <td class="tg-nrix">$p \in P, p \notin Obj \cup Bkg$</td>
+          </tr>
+          <tr>
+            <td class="tg-nrix">$K$</td>
+            <td class="tg-nrix">$p \in Obj$</td>
+          </tr>
+          <tr>
+            <td class="tg-nrix">$0$</td>
+            <td class="tg-nrix">$p \in Bkg$</td>
+          </tr>
+          <tr>
+            <td class="tg-nrix" rowspan="3">$(p,T)$</td>
+            <td class="tg-nrix">$\lambda Rp_{obj}(p)$</td>
+            <td class="tg-nrix">$p \in P, p \notin Obj \cup Bkg$</td>
+          </tr>
+          <tr>
+            <td class="tg-nrix">$0$</td>
+            <td class="tg-nrix">$p \in Obj$</td>
+          </tr>
+          <tr>
+            <td class="tg-nrix">$K$</td>
+            <td class="tg-nrix">$p \in Bkg$</td>
+          </tr>
+        </tbody>
+        </table>
+
+        <p>
+          Taking into account that high cost values are better candidates to be in the minimal cut, it can be noted that $Bp$ returns higher values when $Ip$ and $Iq$ differ significantly, which is a natural way of predicting a border between neighbouring pixels.
+        </p>
+
+        <p>
+          Less intuitively, $Rp$ provides lower values when it is more probable that $Ip$ corresponds to the seed. This means $Rp$ is used to assign weights to edges connecting to the terminal of the <i>contrary</i> seed it represents. For example, if a pixel is very probable to be part of "obj", then it should be favourable to cut its edge to $T$  ("bkg"), and so on.
+        </p>
+
+        <p>
+          Pixels that are marked as seeds take this to the extreme, by assigning $0$ to their opposite seed, cutting the edge by default since the very beginning. On the contrary, a very high constant $K$ is assigned to the weight of their corresponding seed, making the cut unfeasible under all circumstances. This could also be adjusted to $K = \infty$ if desired.
+        </p>
+
+
+      <h2 id="algorithm">Boykov-Kolmogorov Algorithm</h2>
+        <h3>Motivation</h3>
+          <p>
+            Once the graph is initialized, different algorithms can be used to find the max-flow. For this implementation, an <i>augmenting path</i> based algorithm described in <a href="#ref2">[2]</a> was employed, which will continue to be described as the <b>BK algorithm</b>.
+          </p>
+
+          <p>
+            Traditionally, augmenting path algorithms iteratively look for the shortest paths from the source to the sink ($path_{ST}$), having to start the search process each time that all the paths of a given length are exhausted (i.e. they become saturated). The BK algorithm seeks to improve performance of other push-relabel methods by optimizing the step where $path_{ST}$ is searched, by reusing paths from previous iterations.
+          </p>
+
+          <p>
+            The basic idea is to build two separate non-overlapping search trees, one starting from $S$ and the other from $T$. These trees are grown (via, for example, breadth first search), and whenever they touch, a $path_{ST}$ is found. Note that this path is not necessarily the shortest path possible. After using the $path_{ST}$, the trees are shortened in a particular way, so in next iterations the modified trees are taken as starting point and grown.
+          </p>
+
+        <h3>Overview</h3>
+          <p>
+            At any given moment, two non-overlapping search trees occupy nodes from $P$: $S_t$ having as root the source and $T_t$ having as root the sink. The nodes not present in $S_t \cup T_t$ are said to be "free", and can be grouped as $F$. Therefore
+            $$S_t \subset V, \quad T_t \subset V, \quad F \subset N, \quad S_t \cup T_t \cup F = V \\ S_t \cap T_t = T_t \cap F = F \cap S_t = \emptyset$$
+
+            This algorithm is based on a directed graph, so order of edges does matter. For any given edge $E = (p,q)$ of a tree, a <b>parent-child</b> relationship can be defined according to which tree it belongs to. Furthermore, any edge covered by a search tree must be unsaturated.
           </p>
 
           <table class="tg">
-          <thead>
-            <tr>
-              <th class="tg-nrix">edge type</th>
-              <th class="tg-nrix">weight (cost)</th>
-              <th class="tg-nrix">condition</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="tg-nrix">$(p,q)$</td>
-              <td class="tg-nrix">$Bp(p,q)$</td>
-              <td class="tg-nrix">$(p,q) \in E_n$</td>
-            </tr>
-            <tr>
-              <td class="tg-nrix" rowspan="3">$(S,p)$</td>
-              <td class="tg-nrix">$\lambda Rp_{bkg}(p)$</td>
-              <td class="tg-nrix">$p \in P, p \notin Obj \cup Bkg$</td>
-            </tr>
-            <tr>
-              <td class="tg-nrix">$K$</td>
-              <td class="tg-nrix">$p \in Obj$</td>
-            </tr>
-            <tr>
-              <td class="tg-nrix">$0$</td>
-              <td class="tg-nrix">$p \in Bkg$</td>
-            </tr>
-            <tr>
-              <td class="tg-nrix" rowspan="3">$(p,T)$</td>
-              <td class="tg-nrix">$\lambda Rp_{obj}(p)$</td>
-              <td class="tg-nrix">$p \in P, p \notin Obj \cup Bkg$</td>
-            </tr>
-            <tr>
-              <td class="tg-nrix">$0$</td>
-              <td class="tg-nrix">$p \in Obj$</td>
-            </tr>
-            <tr>
-              <td class="tg-nrix">$K$</td>
-              <td class="tg-nrix">$p \in Bkg$</td>
-            </tr>
-          </tbody>
+            <thead>
+              <tr>
+                <th class="tg-nrix">tree</th>
+                <th class="tg-nrix">parent</th>
+                <th class="tg-nrix">child</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="tg-nrix">$S_t$</td>
+                <td class="tg-nrix">$p$</td>
+                <td class="tg-nrix">$q$</td>
+              </tr>
+              <tr>
+                <td class="tg-nrix">$T_t$</td>
+                <td class="tg-nrix">$q$</td>
+                <td class="tg-nrix">$p$</td>
+              </tr>
+            </tbody>
           </table>
 
           <p>
-            Taking into account that high cost values are better candidates to be in the minimal cut, it can be noted that $Bp$ returns higher values when $Ip$ and $Iq$ differ significantly, which is a natural way of predicting a border between neighbouring pixels.
+            The nodes from either tree can be <b>active</b> or <b>passive</b>. The active nodes $A \subset N$ are the leaves of the tree, while passive nodes are internal. Active nodes $p \in A$ allow the tree to <b>grow</b> by recruiting new children $q$ such that $q \in F$ and $e = (p, q), w_e > 0$. During this process, a $path_{ST}$ is found when a leaf from $S_t$ tries to recruit a leaf from $T_t$ or viceversa. These concepts are schematized by <a href="#ref2">[2]</a> in the following way:
           </p>
+
+          <figure>
+            <img class="fig2" src="figures/bk_schema.png", alt="Schema for the BK algorithm">
+          </figure>
 
           <p>
-            Less intuitively, $Rp$ provides lower values when it is more probable that $Ip$ corresponds to the seed. This means $Rp$ is used to assign weights to edges connecting to the terminal of the <i>contrary</i> seed it represents. For example, if a pixel is very probable to be part of "obj", then it should be favourable to cut its edge to $T$  ("bkg"), and so on.
+            A final subset of nodes $O$ denominated <b>orphans</b> is also considered. The BK algorithm is started by <a href="#graph">representing the image as a graph</a>, then initializing the search related subsets as
+            $$S_t = Obj, \quad T_t = Bkg, \quad A = Borders(S_t) \cup Borders(T_t), \quad O = \emptyset$$
+
+            Some other terms are also defined, namely:
           </p>
+
+          <ul>
+            <li>$TREE(p)$, a flag that stores whether a node is part of $S_t$, $T_t$ or $F$</li>
+            <li>$PARENT(p)$, to refer to the parent of $p$ in $TREE(p)$</li>
+            <li>$ORIGIN(p)$, which can be either $S$ or $T$ and requires a valid path between $p$ and its respective terminal, otherwise $ORIGIN(p) = \varnothing$</li>
+            <li>$cap(p \to q)$, which refers to the residual capacity of the edge $(p, q)$ if $TREE(p) = S_t$ or $(q, p)$ if $TREE(p) = T_t$</li>
+          </ul>
 
           <p>
-            Pixels that are marked as seeds take this to the extreme, by assigning $0$ to their opposite seed, cutting the edge by default since the very beginning. On the contrary, a very high constant $K$ is assigned to the weight of their corresponding seed, making the cut unfeasible under all circumstances. This could also be adjusted to $K = \infty$ if desired.
+            After initialization, the algorithm iteratively repeats three stages: <b>Growth</b>, <b>Augmentation</b> and <b>Adoption</b>. Exiting from the loop is controlled by the result of the growth stage.
           </p>
 
+          <figure>
+            <img class="fig_small" src="figures/borders.png", alt="Description of Borders()">
+            <figcaption class="text-center">Description of the $Borders$ function. This is a small addition to the original BK algorithm that optimizes the first iteration when large seeds are given.</figcaption>
+          </figure>
 
-        <h2 id="algorithm">Boykov-Kolmogorov Algorithm</h2>
-          <h3>Motivation</h3>
-            <p>
-              Once the graph is initialized, different algorithms can be used to find the max-flow. For this implementation, an <i>augmenting path</i> based algorithm described in <a href="#ref2">[2]</a> was employed, which will continue to be described as the <b>BK algorithm</b>.
-            </p>
+        <h3>Growth</h3>
+          <p>
+            This stage is summarized by <a href="#ref2">[2]</a> as: "search trees [$S_t$] and [$T_t$] grow until they touch giving a [$path_{ST}$]". This is the stage where active nodes try to recruit new free nodes, until all active nodes are depleted. It returns a $path_{ST}$ if it finds one, otherwise the stage loop ends and $path_{ST}$ is returned as $\emptyset$. This halts the BK algorithm main loop, indicating that the optimal cut was found.
+          </p>
 
-            <p>
-              Traditionally, augmenting path algorithms iteratively look for the shortest paths from the source to the sink ($path_{ST}$), having to start the search process each time that all the paths of a given length are exhausted (i.e. they become saturated). The BK algorithm seeks to improve performance of other push-relabel methods by optimizing the step where $path_{ST}$ is searched, by reusing paths from previous iterations.
-            </p>
+          <figure>
+            <img class="fig2" src="figures/stage_grow.png", alt="Pseudocode for the growth stage">
+            <figcaption class="text-center">Pseudocode for the growth stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
+          </figure>
 
-            <p>
-              The basic idea is to build two separate non-overlapping search trees, one starting from $S$ and the other from $T$. These trees are grown (via, for example, breadth first search), and whenever they touch, a $path_{ST}$ is found. Note that this path is not necessarily the shortest path possible. After using the $path_{ST}$, the trees are shortened in a particular way, so in next iterations the modified trees are taken as starting point and grown.
-            </p>
+        <h3>Augmentation</h3>
+          <p>
+            This stage is summarized by <a href="#ref2">[2]</a> as: "the found path is augmented, search tree(s) break into forest(s)". It takes as input the $path_{ST}$ found in the growth stage, and pushes the maximum amount of flow that path can handle. This means one or more edges in the path get saturated, making these edges invalid as a parent-child relationship. An affected child node becomes both an <b>orphan</b> and the root of a new subtree $O_t$ spanning the orphan's descendants. Futhermore, $ORIGIN(n) = \varnothing \quad \forall n \in O_t$.
+          </p>
 
-          <h3>Overview</h3>
-            <p>
-              At any given moment, two non-overlapping search trees occupy nodes from $P$: $S_t$ having as root the source and $T_t$ having as root the sink. The nodes not present in $S_t \cup T_t$ are said to be "free", and can be grouped as $F$. Therefore
-              $$S_t \subset V, \quad T_t \subset V, \quad F \subset N, \quad S_t \cup T_t \cup F = V \\ S_t \cap T_t = T_t \cap F = F \cap S_t = \emptyset$$
+          <figure>
+            <img class="fig2" src="figures/stage_augment.png", alt="Pseudocode for the augmentation stage">
+            <figcaption class="text-center">Pseudocode for the augmentation stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
+          </figure>
 
-              This algorithm is based on a directed graph, so order of edges does matter. For any given edge $E = (p,q)$ of a tree, a <b>parent-child</b> relationship can be defined according to which tree it belongs to. Furthermore, any edge covered by a search tree must be unsaturated.
-            </p>
+        <h3>Adoption</h3>
+          <p>
+            This stage is summarized by <a href="#ref2">[2]</a> as: "trees [$S_t$] and [$T_t$] are restored". This stage seeks to find a new valid parent $p$ for each orphan $o$. A valid parent should satisfy $TREE(p) = TREE(o), ORIGIN(p) = TREE(o)$ and the edge connecting them must satisfy $w_e > 0$. If a parent is found, the subtree $O_t$ is restored to the main tree and $ORIGIN(n) = TREE(p) \quad \forall n \in O_t$. If no parent is found, $TREE(o) := F$ and its children are declared as orphans. Furthermore, all neighbours $q$ of $o$ such that $TREE(q) = TREE(o)$ should become active. This procedure is repeated until no orphans are left.
+          </p>
 
-            <table class="tg">
-              <thead>
-                <tr>
-                  <th class="tg-nrix">tree</th>
-                  <th class="tg-nrix">parent</th>
-                  <th class="tg-nrix">child</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="tg-nrix">$S_t$</td>
-                  <td class="tg-nrix">$p$</td>
-                  <td class="tg-nrix">$q$</td>
-                </tr>
-                <tr>
-                  <td class="tg-nrix">$T_t$</td>
-                  <td class="tg-nrix">$q$</td>
-                  <td class="tg-nrix">$p$</td>
-                </tr>
-              </tbody>
-            </table>
+          <figure>
+            <img class="fig2" src="figures/stage_adopt.png", alt="Pseudocode for the adoption stage">
+            <figcaption class="text-center">Pseudocode for the adoption stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
+          </figure>
 
-            <p>
-              The nodes from either tree can be <b>active</b> or <b>passive</b>. The active nodes $A \subset N$ are the leaves of the tree, while passive nodes are internal. Active nodes $p \in A$ allow the tree to <b>grow</b> by recruiting new children $q$ such that $q \in F$ and $e = (p, q), w_e > 0$. During this process, a $path_{ST}$ is found when a leaf from $S_t$ tries to recruit a leaf from $T_t$ or viceversa. These concepts are schematized by <a href="#ref2">[2]</a> in the following way:
-            </p>
 
-            <figure>
-              <img class="fig2" src="figures/bk_schema.png", alt="Schema for the BK algorithm">
-            </figure>
-
-            <p>
-              A final subset of nodes $O$ denominated <b>orphans</b> is also considered. The BK algorithm is started by <a href="#graph">representing the image as a graph</a>, then initializing the search related subsets as
-              $$S_t = Obj, \quad T_t = Bkg, \quad A = Borders(S_t) \cup Borders(T_t), \quad O = \emptyset$$
-
-              Some other terms are also defined, namely:
-            </p>
-
+      <h2 id="implementation">Python Implementation</h2>
+        <h3>Requirements</h3>
+          <p>
+            This implementation is written for Python 3.8 and above. It aims to be highly portable, so it has few basic dependencies:
             <ul>
-              <li>$TREE(p)$, a flag that stores whether a node is part of $S_t$, $T_t$ or $F$</li>
-              <li>$PARENT(p)$, to refer to the parent of $p$ in $TREE(p)$</li>
-              <li>$ORIGIN(p)$, which can be either $S$ or $T$ and requires a valid path between $p$ and its respective terminal, otherwise $ORIGIN(p) = \varnothing$</li>
-              <li>$cap(p \to q)$, which refers to the residual capacity of the edge $(p, q)$ if $TREE(p) = S_t$ or $(q, p)$ if $TREE(p) = T_t$</li>
+              <li><b><a href="https://numpy.org/">NumPy</a></b> for representing images as matrices and optimizing some steps.</li>
+              <li><b><a href="https://matplotlib.org/">Matplotlib</a></b> (>= 3.5.0) for building the interactive GUI.</li>
+              <li><b><a href="https://pillow.readthedocs.io/en/stable/">Pillow</a></b> for easily handling I/O image operations.</li>
+              <li><b><a href="https://pypi.org/project/psutil/">psutil</a></b> for benchmarking the amount of memory required by the program.</li>
+            </ul>
+          </p>
+
+        <h3>Basic Usage</h3>
+          <p>
+            The source code of this implementation is available to download <a href="https://github.com/DiegoBarMor/interactive-graph-cut-segmentation">here</a>. Downloading <code>src/</code> is sufficient to execute the implementation, while additional test images can be downloaded from <code>samples/</code>. The source code of this report is also available in <code>docs/</code>.
+          </p>
+
+          <p>
+            Two scripts are provided as an entry point to the program, <code>GUI_main.py</code> and <code>GUI_details.py</code>. Both of them behave almost identically (the latter displays an additional window with more details of the BK result), so the focus here is on <code>GUI_main.py</code>. When executed, the user is prompted with a window to select an image file. After that, the main window is displayed. To the left, the selected image is displayed in a black and white representation, while to the right different controls are available.
+          </p>
+
+          <figure>
+            <img src="figures/gui_main.png", alt="Main window of the GUI">
+            <figcaption class="text-center">Main window of the GUI.</figcaption>
+          </figure>
+
+          <p>
+            When hovering over the displayed image, four different actions are available. They can be selected by clicking the respective buttons at the right side, or by pressing the specified keyboard shortcut.
+            <ul>
+              <li><b>OBJ</b> allows to draw seeds for the object (shortcut: Z).</li>
+              <li><b>BKG</b> allows to draw seeds for the background (shortcut: X).</li>
+              <li><b>Erase</b> allows to erase any seed (shortuct: C).</li>
+              <li><b>Nothing</b> allows to interact with the standard matplotlib mouse callbacks, e.g. zooming the image (shortcut: V).</li>
             </ul>
 
-            <p>
-              After initialization, the algorithm iteratively repeats three stages: <b>Growth</b>, <b>Augmentation</b> and <b>Adoption</b>. Exiting from the loop is controlled by the result of the growth stage.
-            </p>
+            This actions are intuitively performed by pressing and holding over the image. Additionaly, the size of the "brush" can be increased by pressing <b>+</b> and decreased by pressing <b>-</b>. The drawn seeds can also be erased completely (<b>Clear seeds</b>), saved for later use (<b>Save seeds</b>) and loaded from previous sessions (<b>Load seeds</b>).
+          </p>
 
-            <figure>
-              <img class="fig_small" src="figures/borders.png", alt="Description of Borders()">
-              <figcaption class="text-center">Description of the $Borders$ function. This is a small addition to the original BK algorithm that optimizes the first iteration when large seeds are given.</figcaption>
-            </figure>
+          <figure>
+            <img src="animations/GUI_seeds.gif", alt="Basic usage of the GUI">
+            <figcaption class="text-center">Basic usage of the GUI.</figcaption>
+          </figure>
 
-          <h3>Growth</h3>
-            <p>
-              This stage is summarized by <a href="#ref2">[2]</a> as: "search trees [$S_t$] and [$T_t$] grow until they touch giving a [$path_{ST}$]". This is the stage where active nodes try to recruit new free nodes, until all active nodes are depleted. It returns a $path_{ST}$ if it finds one, otherwise the stage loop ends and $path_{ST}$ is returned as $\emptyset$. This halts the BK algorithm main loop, indicating that the optimal cut was found.
-            </p>
+        <h3>Fast and Animate cut modes</h3>
+          <p>
+            After preparing the seeds, the default $\sigma$ and $\lambda$ parameters can be modified. The segmentation can then be initialized, with four different options provided by the interface. Options denominated <b>Fast</b> follow a standard implementation of the BK algorithm's loop, and is to be used when only the result is of interest.
+          </p>
 
-            <figure>
-              <img class="fig2" src="figures/stage_grow.png", alt="Pseudocode for the growth stage">
-              <figcaption class="text-center">Pseudocode for the growth stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
-            </figure>
+          <p>
+            Once the segmentation is obtained, the result is portrayed on top of the displayed image. This representation can be toggled on or off, while the result itself can be saved as an image, either just the object (<b>Save OBJ</b>) or just the background (<b>Save BKG</b>). Note that the algorithm yields a <b>mask</b>, which is used to save a segmentation of the original image and not its black and white representation.
+          </p>
 
-          <h3>Augmentation</h3>
-            <p>
-              This stage is summarized by <a href="#ref2">[2]</a> as: "the found path is augmented, search tree(s) break into forest(s)". It takes as input the $path_{ST}$ found in the growth stage, and pushes the maximum amount of flow that path can handle. This means one or more edges in the path get saturated, making these edges invalid as a parent-child relationship. An affected child node becomes both an <b>orphan</b> and the root of a new subtree $O_t$ spanning the orphan's descendants. Futhermore, $ORIGIN(n) = \varnothing \quad \forall n \in O_t$.
-            </p>
+          <figure>
+            <img src="animations/GUI_fast_cut.gif", alt="Performing a fast cut with the GUI">
+            <figcaption class="text-center">Performing a fast cut with the GUI. The final search trees are displayed as a semitransparent red for $S_t$ and semitransparent blue for $T_t$. </figcaption>
+          </figure>
 
-            <figure>
-              <img class="fig2" src="figures/stage_augment.png", alt="Pseudocode for the augmentation stage">
-              <figcaption class="text-center">Pseudocode for the augmentation stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
-            </figure>
+          <p>
+            Options denominated <b>Animate</b> follow a slightly different BK algorithm's main loop. The loop performs a fixed amount of iterations, controlled by the parameter <code>CYCLES_PER_FRAME</code>. When concluded, the current state of the search trees and the last $path_{ST}$ are taken to draw a frame on top of the displayed image. Immediatly afterwards, a new loop is started resuming the state of the previous loop. This effectively allows to animate the algorithm's progress and better understand the concepts behind its execution.
+          </p>
 
-          <h3>Adoption</h3>
-            <p>
-              This stage is summarized by <a href="#ref2">[2]</a> as: "trees [$S_t$] and [$T_t$] are restored". This stage seeks to find a new valid parent $p$ for each orphan $o$. A valid parent should satisfy $TREE(p) = TREE(o), ORIGIN(p) = TREE(o)$ and the edge connecting them must satisfy $w_e > 0$. If a parent is found, the subtree $O_t$ is restored to the main tree and $ORIGIN(n) = TREE(p) \quad \forall n \in O_t$. If no parent is found, $TREE(o) := F$ and its children are declared as orphans. Furthermore, all neighbours $q$ of $o$ such that $TREE(q) = TREE(o)$ should become active. This procedure is repeated until no orphans are left.
-            </p>
+          <p>
+            When the BK algorithm's loop reaches its natural end, the results are displayed as usual. An additional option is present, <b>Toggle paths</b>, that allows to observe all the instances of $path_{ST}$ present in the animation. <code>CYCLES_PER_FRAME</code> should be assigned a sensible value to allow for a faster animation and avoid cluttering when visualizing all paths.
+          </p>
 
-            <figure>
-              <img class="fig2" src="figures/stage_adopt.png", alt="Pseudocode for the adoption stage">
-              <figcaption class="text-center">Pseudocode for the adoption stage, as provided by <a href="#ref2">[2]</a>.</figcaption>
-            </figure>
+          <figure>
+            <img src="animations/GUI_animate_cut.gif", alt="Performing an animated cut with the GUI">
+            <figcaption class="text-center">Performing an animated cut with the GUI. The incomplete search trees follow the same color schema, while pixels crossed by $path_{ST}$ are displayed in green.</figcaption>
+          </figure>
 
+        <h3>BFS and RND cut modes</h3>
+          <p>
+            In different flow based algorithms (including BK), the search procedure performed when finding paths is commonly a breadth-first search (BFS). However, different search methods can be employed, and in the case of a heuristic algorithm such as BK, this can mean affecting the performance of the procedure in a positive or negative way (although the optimal cut will always be the same).
+          </p>
 
-        <h2 id="implementation">Python Implementation</h2>
-          <h3>Requirements</h3>
-            <p>
-              This implementation is written for Python 3.8 and above. It aims to be highly portable, so it has few basic dependencies:
-              <ul>
-                <li><b><a href="https://numpy.org/">NumPy</a></b> for representing images as matrices and optimizing some steps.</li>
-                <li><b><a href="https://matplotlib.org/">Matplotlib</a></b> (>= 3.5.0) for building the interactive GUI.</li>
-                <li><b><a href="https://pillow.readthedocs.io/en/stable/">Pillow</a></b> for easily handling I/O image operations.</li>
-                <li><b><a href="https://pypi.org/project/psutil/">psutil</a></b> for benchmarking the amount of memory required by the program.</li>
-              </ul>
-            </p>
+          <p>
+            This idea is explored by the options denominated with <b>RND</b>, which employ an alternative version of the BK algorithm that uses a random based search in the growth stage. During this stage, when picking an active node BFS always takes the first node of the ordered array $A$, while RND chooses a node from a different random index each time. For completeness, options denominated with <b>BFS</b> employ the standard BFS based algorithm.
+          </p>
 
-          <h3>Basic Usage</h3>
-            <p>
-              The source code of this implementation is available to download <a href="https://github.com/DiegoBarMor/interactive-graph-cut-segmentation">here</a>. Downloading <code>src/</code> is sufficient to execute the implementation, while additional test images can be downloaded from <code>samples/</code>. The source code of this report is also available in <code>docs/</code>.
-            </p>
-
-            <p>
-              Two scripts are provided as an entry point to the program, <code>GUI_main.py</code> and <code>GUI_details.py</code>. Both of them behave almost identically (the latter displays an additional window with more details of the BK result), so the focus here is on <code>GUI_main.py</code>. When executed, the user is prompted with a window to select an image file. After that, the main window is displayed. To the left, the selected image is displayed in a black and white representation, while to the right different controls are available.
-            </p>
-
-            <figure>
-              <img src="figures/gui_main.png", alt="Main window of the GUI">
-              <figcaption class="text-center">Main window of the GUI.</figcaption>
-            </figure>
-
-            <p>
-              When hovering over the displayed image, four different actions are available. They can be selected by clicking the respective buttons at the right side, or by pressing the specified keyboard shortcut.
-              <ul>
-                <li><b>OBJ</b> allows to draw seeds for the object (shortcut: Z).</li>
-                <li><b>BKG</b> allows to draw seeds for the background (shortcut: X).</li>
-                <li><b>Erase</b> allows to erase any seed (shortuct: C).</li>
-                <li><b>Nothing</b> allows to interact with the standard matplotlib mouse callbacks, e.g. zooming the image (shortcut: V).</li>
-              </ul>
-
-              This actions are intuitively performed by pressing and holding over the image. Additionaly, the size of the "brush" can be increased by pressing <b>+</b> and decreased by pressing <b>-</b>. The drawn seeds can also be erased completely (<b>Clear seeds</b>), saved for later use (<b>Save seeds</b>) and loaded from previous sessions (<b>Load seeds</b>).
-            </p>
-
-            <figure>
-              <img src="animations/GUI_seeds.gif", alt="Basic usage of the GUI">
-              <figcaption class="text-center">Basic usage of the GUI.</figcaption>
-            </figure>
-
-          <h3>Fast and Animate cut modes</h3>
-            <p>
-              After preparing the seeds, the default $\sigma$ and $\lambda$ parameters can be modified. The segmentation can then be initialized, with four different options provided by the interface. Options denominated <b>Fast</b> follow a standard implementation of the BK algorithm's loop, and is to be used when only the result is of interest.
-            </p>
-
-            <p>
-              Once the segmentation is obtained, the result is portrayed on top of the displayed image. This representation can be toggled on or off, while the result itself can be saved as an image, either just the object (<b>Save OBJ</b>) or just the background (<b>Save BKG</b>). Note that the algorithm yields a <b>mask</b>, which is used to save a segmentation of the original image and not its black and white representation.
-            </p>
-
-            <figure>
-              <img src="animations/GUI_fast_cut.gif", alt="Performing a fast cut with the GUI">
-              <figcaption class="text-center">Performing a fast cut with the GUI. The final search trees are displayed as a semitransparent red for $S_t$ and semitransparent blue for $T_t$. </figcaption>
-            </figure>
-
-            <p>
-              Options denominated <b>Animate</b> follow a slightly different BK algorithm's main loop. The loop performs a fixed amount of iterations, controlled by the parameter <code>CYCLES_PER_FRAME</code>. When concluded, the current state of the search trees and the last $path_{ST}$ are taken to draw a frame on top of the displayed image. Immediatly afterwards, a new loop is started resuming the state of the previous loop. This effectively allows to animate the algorithm's progress and better understand the concepts behind its execution.
-            </p>
-
-            <p>
-              When the BK algorithm's loop reaches its natural end, the results are displayed as usual. An additional option is present, <b>Toggle paths</b>, that allows to observe all the instances of $path_{ST}$ present in the animation. <code>CYCLES_PER_FRAME</code> should be assigned a sensible value to allow for a faster animation and avoid cluttering when visualizing all paths.
-            </p>
-
-            <figure>
-              <img src="animations/GUI_animate_cut.gif", alt="Performing an animated cut with the GUI">
-              <figcaption class="text-center">Performing an animated cut with the GUI. The incomplete search trees follow the same color schema, while pixels crossed by $path_{ST}$ are displayed in green.</figcaption>
-            </figure>
-
-          <h3>BFS and RND cut modes</h3>
-            <p>
-              In different flow based algorithms (including BK), the search procedure performed when finding paths is commonly a breadth-first search (BFS). However, different search methods can be employed, and in the case of a heuristic algorithm such as BK, this can mean affecting the performance of the procedure in a positive or negative way (although the optimal cut will always be the same).
-            </p>
-
-            <p>
-              This idea is explored by the options denominated with <b>RND</b>, which employ an alternative version of the BK algorithm that uses a random based search in the growth stage. During this stage, when picking an active node BFS always takes the first node of the ordered array $A$, while RND chooses a node from a different random index each time. For completeness, options denominated with <b>BFS</b> employ the standard BFS based algorithm.
-            </p>
-
-            <figure>
-              <div class="d-flex flex-row fig_hscroll">
-                <img class="col px-2" src="animations/GUI_cut_bfs.gif", alt="Animation of a BFS cut">
-                <img class="col px-2" src="animations/GUI_cut_rnd.gif", alt="Animation of a RND cut">
-              </div>
-              <div class="row">
-                <figcaption class="text-center">Comparison of the growth phase between a BFS based cut (left) and a RND based cut (right).</figcaption>
-              </div>
-            </figure>
-
-            <p>
-              Ideally, in some cases this might allow to find the shortest $path_{ST}$ faster and improve performance, or reduce the number of BK main loop's cycles in some other unforeseen way. However, this is by nature a highly empirical decision. For example, in the images tested for this implementation, RND appears to find some shorter paths than BFS (as observed in the figure below), but ultimately requires slightly more cycles.
-            </p>
-
-            <figure>
-              <div class="d-flex flex-row fig_hscroll">
-                <img class="col px-2" src="figures/gui_cut_bfs.png", alt="Paths found by a BFS cut">
-                <img class="col px-2" src="figures/gui_cut_rnd.png", alt="Paths found by a RND cut">
-              </div>
-              <div class="row">
-                <figcaption class="text-center">Comparison of the paths $path_{ST}$ found by a BFS based cut (left) and a RND based cut (right). BFS required 1769 cut cycles while RND required 1794 cycles.</figcaption>
-              </div>
-            </figure>
-
-          <h3>Additional Details</h3>
-            <p>
-              Some additional details can be observed after performing any kind of cut using <code>GUI_details.py</code>. The regional penalties can be observed by plotting the values of the costs of terminal edges. Note that <b>regions</b> of similarly valued edges can be observed around their respective extreme-valued seeds.
-            </p>
-
-            <figure>
-              <div class="d-flex flex-row fig_hscroll">
-                <img class="col px-2 fig2" src="figures/penalties_Rp.png", alt="Rp penalties">
-              </div>
-              <div class="row">
-                <figcaption class="text-center">Representation of the penalty values for edges connecting to the source ("Rp bck") and to the sink ("Rp obj"). Darker values represent higher edge costs.</figcaption>
-              </div>
-            </figure>
-
-            <p>
-              Representing the boundary penalties is a bit trickier. Each pixel is involved in up to four Bp values, one for each direction (left, right, up, down). Therefore, for displaying the values of the costs of non-terminal edges, four different plots are represented, one for each direction.
-            </p>
-
-            <p>
-              Note that in the plots for the state <i>before</i> the cut, <b>boundaries</b> of high costs can be observed in sections where there is a drastic change of $Ip$ value. These boundaries are either vertical or horizontal, depending on the direction of the neighbouring relationship. Furthermore, it can be observed that many new perpendicular "borders" are generated after the cut. These are from pixels that belonged to one or more $path_{ST}$ and got saturated through the BK algorithm.
-            </p>
-
-
-            <figure >
-              <div class="d-flex flex-row fig_hscroll">
-                <img class="col px-2 img3 fig2alt" src="figures/penalties_Bp_before.png", alt="Bp penalties (before)">
-                <img class="col px-2 img3 fig2alt" src="figures/penalties_Bp_after.png", alt="Bp penalties (after)">
-              </div>
-              <div class="row">
-                <figcaption class="text-center">Representation of the penalty values for edges connecting neighbours on the four different directions. Values before (2x2 grid left) and after (2x2 grid right) the cut can be compared. Darker values represent higher edge costs. <small>(Scroll horizontally to see full figure, if incomplete. Figure consists of 8 subplots)</small></figcaption>
-              </div>
-            </figure>
-
-          <h3>Examples of Usage</h3>
-            <p>
-              Three simple images<small>*</small> with different degrees of complexity were used to test the graph-cut algorithm. The same set of seeds was used for a given image when obtaining different results. Below are some examples of usage under different values of $\sigma$.<small>**</small>
-
-              <br><small>
-                * For this implementation, it is recommended to use images with less than one million pixels to retain performance, specially if performing animations. <br>
-                ** Due to lack of clarity from different sources on how to implement BK, this implementation has a bug where changing $\lambda$ doesn't affect the result. This is to be fixed in the future.
-              </small>
-            </p>
-
-            <figure>
-              <div class="d-flex flex-row fig_hscroll">
-                <img class="col px-2 img3" src="figures/pup.png" alt="Example image: Simple illustration">
-                <img class="col px-2 img3" src="figures/bird.png" alt="Example image: More detailed illustration">
-                <img class="col px-2 img3" src="figures/realcat.png" alt="Example image: Photography">
-              </div>
-              <div class="row">
-                <figcaption class="text-center">Test images presented as examples for the segmentation, with different levels of complexity: left) a simple 304x304 illustration <a href="#ref6">[6]</a>, middle) a more detailed 414x354 illustration <a href="#ref7">[7]</a>, right) a 500x464 photography.</figcaption>
-              </div>
-            </figure>
-
-            <figure>
+          <figure>
             <div class="d-flex flex-row fig_hscroll">
-              <img class="col px-2 img3" src="figures/pup_seeds.png" alt="Seeded image: Simple illustration">
-              <img class="col px-2 img3" src="figures/bird_seeds.png" alt="Seeded image: More detailed illustration">
-              <img class="col px-2 img3" src="figures/realcat_seeds.png" alt="Seeded image: Photography">
+              <img class="col px-2" src="animations/GUI_cut_bfs.gif", alt="Animation of a BFS cut">
+              <img class="col px-2" src="animations/GUI_cut_rnd.gif", alt="Animation of a RND cut">
             </div>
             <div class="row">
-              <figcaption class="text-center">Sets of seeds used for each image.</figcaption>
+              <figcaption class="text-center">Comparison of the growth phase between a BFS based cut (left) and a RND based cut (right).</figcaption>
             </div>
-            </figure>
+          </figure>
 
-            <figure>
+          <p>
+            Ideally, in some cases this might allow to find the shortest $path_{ST}$ faster and improve performance, or reduce the number of BK main loop's cycles in some other unforeseen way. However, this is by nature a highly empirical decision. For example, in the images tested for this implementation, RND appears to find some shorter paths than BFS (as observed in the figure below), but ultimately requires slightly more cycles.
+          </p>
+
+          <figure>
             <div class="d-flex flex-row fig_hscroll">
-              <img class="col px-2 img3" src="figures/pup-OBJ.png", alt="Result of the segmentation (object)">
-              <img class="col px-2 img3" src="figures/pup-BKG.png", alt="Result of the segmentation (background)">
+              <img class="col px-2" src="figures/gui_cut_bfs.png", alt="Paths found by a BFS cut">
+              <img class="col px-2" src="figures/gui_cut_rnd.png", alt="Paths found by a RND cut">
             </div>
             <div class="row">
-              <figcaption class="text-center">Result of the segmentation ($\sigma = 0.01, \lambda = 0.2$): left) object, right) background.</figcaption>
+              <figcaption class="text-center">Comparison of the paths $path_{ST}$ found by a BFS based cut (left) and a RND based cut (right). BFS required 1769 cut cycles while RND required 1794 cycles.</figcaption>
             </div>
-            </figure>
+          </figure>
 
-            <figure>
+        <h3>Additional Details</h3>
+          <p>
+            Some additional details can be observed after performing any kind of cut using <code>GUI_details.py</code>. The regional penalties can be observed by plotting the values of the costs of terminal edges. Note that <b>regions</b> of similarly valued edges can be observed around their respective extreme-valued seeds.
+          </p>
+
+          <figure>
             <div class="d-flex flex-row fig_hscroll">
-              <img class="col px-2 img3" src="figures/bird-S0.1.png", alt="Result of the segmentation (sigma = 0.1)">
-              <img class="col px-2 img3" src="figures/bird-S0.01.png", alt="Result of the segmentation (sigma = 0.01)">
-              <img class="col px-2 img3" src="figures/bird-S0.001.png", alt="Result of the segmentation (sigma = 0.001)">
+              <img class="col px-2 fig2" src="figures/penalties_Rp.png", alt="Rp penalties">
             </div>
             <div class="row">
-              <figcaption class="text-center">Result of the segmentation under different parameter values (constant $\lambda = 0.2$): left) $\sigma = 0.1$, middle) $\sigma = 0.01$, right) $\sigma = 0.001$.</figcaption>
+              <figcaption class="text-center">Representation of the penalty values for edges connecting to the source ("Rp bck") and to the sink ("Rp obj"). Darker values represent higher edge costs.</figcaption>
             </div>
-            </figure>
+          </figure>
 
-            <figure>
+          <p>
+            Representing the boundary penalties is a bit trickier. Each pixel is involved in up to four Bp values, one for each direction (left, right, up, down). Therefore, for displaying the values of the costs of non-terminal edges, four different plots are represented, one for each direction.
+          </p>
+
+          <p>
+            Note that in the plots for the state <i>before</i> the cut, <b>boundaries</b> of high costs can be observed in sections where there is a drastic change of $Ip$ value. These boundaries are either vertical or horizontal, depending on the direction of the neighbouring relationship. Furthermore, it can be observed that many new perpendicular "borders" are generated after the cut. These are from pixels that belonged to one or more $path_{ST}$ and got saturated through the BK algorithm.
+          </p>
+
+
+          <figure >
             <div class="d-flex flex-row fig_hscroll">
-              <img class="col px-2 img3" src="figures/realcat-S0.5.png", alt="Result of the segmentation (sigma = 0.5)">
-              <img class="col px-2 img3" src="figures/realcat-S0.1.png", alt="Result of the segmentation (sigma = 0.1)">
-              <img class="col px-2 img3" src="figures/realcat-S0.01.png", alt="Result of the segmentation (sigma = 0.01)">
+              <img class="col px-2 img3 fig2alt" src="figures/penalties_Bp_before.png", alt="Bp penalties (before)">
+              <img class="col px-2 img3 fig2alt" src="figures/penalties_Bp_after.png", alt="Bp penalties (after)">
             </div>
             <div class="row">
-              <figcaption class="text-center">Result of the segmentation under different parameter values (constant $\lambda = 0.2$): left) $\sigma = 0.5$, middle) $\sigma = 0.1$, right) $\sigma = 0.01$.</figcaption>
+              <figcaption class="text-center">Representation of the penalty values for edges connecting neighbours on the four different directions. Values before (2x2 grid left) and after (2x2 grid right) the cut can be compared. Darker values represent higher edge costs. <small>(Scroll horizontally to see full figure, if incomplete. Figure consists of 8 subplots)</small></figcaption>
             </div>
-            </figure>
+          </figure>
 
-            <p>
-              As expected, the results can vary drastically when changing $\sigma$. Reducing it makes the boundary penalty more strict, which can lead to more aggresive cuts and granularity in the results. On the other hand, increasing it relaxes the penalty, which can potentially disrupt how $Bp$ and $Rp$ relate when finding the max-flow and lead to erroneous segmentations.
-            </p>
+        <h3>Examples of Usage</h3>
+          <p>
+            Three simple images<small>*</small> with different degrees of complexity were used to test the graph-cut algorithm. The same set of seeds was used for a given image when obtaining different results. Below are some examples of usage under different values of $\sigma$.<small>**</small>
 
-            <p>
-              Nevertheless, if a segmentation is not satisfactory, the seeds or parameters can be adjusted to try and obtain better results. This implementation of the BK algorithm proved to be relatively fast for small images, requiring just a couple of seconds to complete the segmentation and less than 500 MB of memory for the example images, so testing different segmentation settings is indeed viable.
-            </p>
+            <br><small>
+              * For this implementation, it is recommended to use images with less than one million pixels to retain performance, specially if performing animations. <br>
+              ** Due to lack of clarity from different sources on how to implement BK, this implementation has a bug where changing $\lambda$ doesn't affect the result. This is to be fixed in the future.
+            </small>
+          </p>
+
+          <figure>
+            <div class="d-flex flex-row fig_hscroll">
+              <img class="col px-2 img3" src="figures/pup.png" alt="Example image: Simple illustration">
+              <img class="col px-2 img3" src="figures/bird.png" alt="Example image: More detailed illustration">
+              <img class="col px-2 img3" src="figures/realcat.png" alt="Example image: Photography">
+            </div>
+            <div class="row">
+              <figcaption class="text-center">Test images presented as examples for the segmentation, with different levels of complexity: left) a simple 304x304 illustration <a href="#ref6">[6]</a>, middle) a more detailed 414x354 illustration <a href="#ref7">[7]</a>, right) a 500x464 photography.</figcaption>
+            </div>
+          </figure>
+
+          <figure>
+          <div class="d-flex flex-row fig_hscroll">
+            <img class="col px-2 img3" src="figures/pup_seeds.png" alt="Seeded image: Simple illustration">
+            <img class="col px-2 img3" src="figures/bird_seeds.png" alt="Seeded image: More detailed illustration">
+            <img class="col px-2 img3" src="figures/realcat_seeds.png" alt="Seeded image: Photography">
+          </div>
+          <div class="row">
+            <figcaption class="text-center">Sets of seeds used for each image.</figcaption>
+          </div>
+          </figure>
+
+          <figure>
+          <div class="d-flex flex-row fig_hscroll">
+            <img class="col px-2 img3" src="figures/pup-OBJ.png", alt="Result of the segmentation (object)">
+            <img class="col px-2 img3" src="figures/pup-BKG.png", alt="Result of the segmentation (background)">
+          </div>
+          <div class="row">
+            <figcaption class="text-center">Result of the segmentation ($\sigma = 0.01, \lambda = 0.2$): left) object, right) background.</figcaption>
+          </div>
+          </figure>
+
+          <figure>
+          <div class="d-flex flex-row fig_hscroll">
+            <img class="col px-2 img3" src="figures/bird-S0.1.png", alt="Result of the segmentation (sigma = 0.1)">
+            <img class="col px-2 img3" src="figures/bird-S0.01.png", alt="Result of the segmentation (sigma = 0.01)">
+            <img class="col px-2 img3" src="figures/bird-S0.001.png", alt="Result of the segmentation (sigma = 0.001)">
+          </div>
+          <div class="row">
+            <figcaption class="text-center">Result of the segmentation under different parameter values (constant $\lambda = 0.2$): left) $\sigma = 0.1$, middle) $\sigma = 0.01$, right) $\sigma = 0.001$.</figcaption>
+          </div>
+          </figure>
+
+          <figure>
+          <div class="d-flex flex-row fig_hscroll">
+            <img class="col px-2 img3" src="figures/realcat-S0.5.png", alt="Result of the segmentation (sigma = 0.5)">
+            <img class="col px-2 img3" src="figures/realcat-S0.1.png", alt="Result of the segmentation (sigma = 0.1)">
+            <img class="col px-2 img3" src="figures/realcat-S0.01.png", alt="Result of the segmentation (sigma = 0.01)">
+          </div>
+          <div class="row">
+            <figcaption class="text-center">Result of the segmentation under different parameter values (constant $\lambda = 0.2$): left) $\sigma = 0.5$, middle) $\sigma = 0.1$, right) $\sigma = 0.01$.</figcaption>
+          </div>
+          </figure>
+
+          <p>
+            As expected, the results can vary drastically when changing $\sigma$. Reducing it makes the boundary penalty more strict, which can lead to more aggresive cuts and granularity in the results. On the other hand, increasing it relaxes the penalty, which can potentially disrupt how $Bp$ and $Rp$ relate when finding the max-flow and lead to erroneous segmentations.
+          </p>
+
+          <p>
+            Nevertheless, if a segmentation is not satisfactory, the seeds or parameters can be adjusted to try and obtain better results. This implementation of the BK algorithm proved to be relatively fast for small images, requiring just a couple of seconds to complete the segmentation and less than 500 MB of memory for the example images, so testing different segmentation settings is indeed viable.
+          </p>
 
 
-        <h2 id="references">References</h2>
-          <ol>
-            <li id="ref1">Boykov, Y. Y., and M. P. Jolly. “Interactive Graph Cuts for Optimal Boundary & Region Segmentation of Objects in N-D Images.” Proceedings Eighth IEEE International Conference on Computer Vision. ICCV 2001, vol. 1, 2001, pp. 105–12 vol.1. IEEE Xplore, https://doi.org/10.1109/ICCV.2001.937505. <a href="https://www.csd.uwo.ca/~yboykov/Papers/iccv01.pdf">Source.</a></li>
-            <li id="ref2">Boykov, Y., and V. Kolmogorov. “An Experimental Comparison of Min-Cut/Max- Flow Algorithms for Energy Minimization in Vision.” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 26, no. 9, Sept. 2004, pp. 1124–37. DOI.org (Crossref), https://doi.org/10.1109/TPAMI.2004.60. <a href="https://www.csd.uwo.ca/~yboykov/Papers/pami04.pdf">Source.</a></li>
-            <li id="ref3">Boykov, Yuri, and Gareth Funka-Lea. “Graph Cuts and Efficient N-D Image Segmentation.” International Journal of Computer Vision, vol. 70, no. 2, Nov. 2006, pp. 109–31. Springer Link, https://doi.org/10.1007/s11263-006-7934-5. <a href="https://www.csd.uwo.ca/~yboykov/Papers/ijcv06.pdf">Source.</a></li>
-            <li id="ref4">Juan, O., and Y. Boykov. “Active Graph Cuts.” 2006 IEEE Computer Society Conference on Computer Vision and Pattern Recognition (CVPR’06), vol. 1, 2006, pp. 1023–29. IEEE Xplore, https://doi.org/10.1109/CVPR.2006.47. <a href="https://www.researchgate.net/publication/4246196_Active_Graph_Cuts">Source.</a></li>
-            <li id="ref5">Humayun, Ahmad, et al. “RIGOR: Reusing Inference in Graph Cuts for Generating Object Regions.” 2014 IEEE Conference on Computer Vision and Pattern Recognition, 2014, pp. 336–43. IEEE Xplore, https://doi.org/10.1109/CVPR.2014.50. <a href="https://openaccess.thecvf.com/content_cvpr_2014/papers/Humayun_RIGOR_Reusing_Inference_2014_CVPR_paper.pdf">Source.</a></li>
-            <li id="ref6">The test image "pup.png" was uploaded to a royalty-free hosting website by @thebeekeep. <a href="https://www.pixilart.com/art/puppy-5f5b2da201c4894">Source</a>.
-            <li id="ref7">The test image "bird.png" was uploaded to a royalty-free hosting website by @Ceru. <a href="https://www.pixilart.com/art/in-the-clouds-0f7bddd764d93bc">Source</a>.
-          </ol>
+      <h2 id="references">References</h2>
+        <ol>
+          <li id="ref1">Boykov, Y. Y., and M. P. Jolly. “Interactive Graph Cuts for Optimal Boundary & Region Segmentation of Objects in N-D Images.” Proceedings Eighth IEEE International Conference on Computer Vision. ICCV 2001, vol. 1, 2001, pp. 105–12 vol.1. IEEE Xplore, https://doi.org/10.1109/ICCV.2001.937505. <a href="https://www.csd.uwo.ca/~yboykov/Papers/iccv01.pdf">Source.</a></li>
+          <li id="ref2">Boykov, Y., and V. Kolmogorov. “An Experimental Comparison of Min-Cut/Max- Flow Algorithms for Energy Minimization in Vision.” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 26, no. 9, Sept. 2004, pp. 1124–37. DOI.org (Crossref), https://doi.org/10.1109/TPAMI.2004.60. <a href="https://www.csd.uwo.ca/~yboykov/Papers/pami04.pdf">Source.</a></li>
+          <li id="ref3">Boykov, Yuri, and Gareth Funka-Lea. “Graph Cuts and Efficient N-D Image Segmentation.” International Journal of Computer Vision, vol. 70, no. 2, Nov. 2006, pp. 109–31. Springer Link, https://doi.org/10.1007/s11263-006-7934-5. <a href="https://www.csd.uwo.ca/~yboykov/Papers/ijcv06.pdf">Source.</a></li>
+          <li id="ref4">Juan, O., and Y. Boykov. “Active Graph Cuts.” 2006 IEEE Computer Society Conference on Computer Vision and Pattern Recognition (CVPR’06), vol. 1, 2006, pp. 1023–29. IEEE Xplore, https://doi.org/10.1109/CVPR.2006.47. <a href="https://www.researchgate.net/publication/4246196_Active_Graph_Cuts">Source.</a></li>
+          <li id="ref5">Humayun, Ahmad, et al. “RIGOR: Reusing Inference in Graph Cuts for Generating Object Regions.” 2014 IEEE Conference on Computer Vision and Pattern Recognition, 2014, pp. 336–43. IEEE Xplore, https://doi.org/10.1109/CVPR.2014.50. <a href="https://openaccess.thecvf.com/content_cvpr_2014/papers/Humayun_RIGOR_Reusing_Inference_2014_CVPR_paper.pdf">Source.</a></li>
+          <li id="ref6">The test image "pup.png" was uploaded to a royalty-free hosting website by @thebeekeep. <a href="https://www.pixilart.com/art/puppy-5f5b2da201c4894">Source</a>.
+          <li id="ref7">The test image "bird.png" was uploaded to a royalty-free hosting website by @Ceru. <a href="https://www.pixilart.com/art/in-the-clouds-0f7bddd764d93bc">Source</a>.
+        </ol>
 
-      </div>
-    </body>
-  </html>
+    </main>
+
+    <div id="bg-animation-container"></div>
+
+  </body>
+
+  <script src="https://raw.githack.com/DiegoBarMor/chocomint-css/main/chocomint.min.js"></script>
+  <script src="navbar.js"></script>
+
+</html>
